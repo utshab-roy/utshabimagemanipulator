@@ -3,9 +3,9 @@
 class Image_Manipulation{
     public $file;
     private  $data;
-    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false; public $watermarked = false;
+    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false; public $watermarked = false;  public $thumbnailed = false;
 
-    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file; public $watermarked_file;
+    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file; public $watermarked_file; public $thumbnail_file;
 
     public $rotation_deg;
 
@@ -137,6 +137,28 @@ class Image_Manipulation{
         }
     }
 
+    public function create_thumbnail(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+
+            $width = imagesx($this->data);
+            $height = imagesy($this->data);
+
+            $thumb_width = intval($width / 5);
+            $thumb_height = intval($height / 5);
+
+            $thumbnail = imagecreatetruecolor($thumb_width, $thumb_height);
+
+            imagecopyresampled($thumbnail, $this->data, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+
+            imagejpeg($thumbnail, 'manipulated_image/thumbnail_' . $this->file, 100);
+            $this->thumbnail_file = 'thumbnail_' . $this->file;
+            imagedestroy($thumbnail);
+            imagedestroy($this->data);
+            $this->thumbnailed = true;
+        }
+    }
+
     /**
      * Save file
      *
@@ -204,6 +226,7 @@ $img->resize_image();
 $img->add_text_on_image();
 $img->add_stamp_on_image();
 $img->add_watermark_on_image();
+$img->create_thumbnail();
 
 //echo "<pre>";
 //print_r($image_info);
@@ -265,6 +288,10 @@ if ($img->watermarked == true){
     echo "<img src='manipulated_image/$img->watermarked_file' width='500' height='333' >";
 }
 
+if ($img->thumbnailed == true){
+    echo '<br/><h3>Thumbnail of the Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->thumbnail_file' >";
+}
 
 ?>
 
