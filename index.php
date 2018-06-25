@@ -3,9 +3,13 @@
 class Image_Manipulation{
     public $file;
     private  $data;
-    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false; public $watermarked = false;  public $thumbnailed = false;
 
-    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file; public $watermarked_file; public $thumbnail_file;
+    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false;
+    public $watermarked = false; public $thumbnailed = false; public $croped = false; public $flip_vertically = false; public $flip_horizontally = false;
+
+
+    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file;
+    public $watermarked_file; public $thumbnail_file; public $croped_file; public $fliped_vertically_file; public $fliped_horizontally_file;
 
     public $rotation_deg;
 
@@ -159,6 +163,47 @@ class Image_Manipulation{
         }
     }
 
+    public function crop_image(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+            $size = min(imagesx($this->data), imagesy($this->data));
+
+
+            $im2 = imagecrop($this->data, ['x' => 0, 'y' => 0, 'width' => ($size - 100), 'height' => ($size - 300)]);
+            if ($im2 !== FALSE) {
+                imagejpeg($im2, 'manipulated_image/croped_' . $this->file, 100);
+                $this->croped_file = 'croped_' . $this->file;
+                imagedestroy($im2);
+            }
+            imagedestroy($this->data);
+            $this->croped = true;
+        }
+    }
+
+    public function flip_image_vertically(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+            imageflip($this->data, IMG_FLIP_VERTICAL);
+
+            imagejpeg($this->data, 'manipulated_image/fliped_vertically_' . $this->file, 100);
+            $this->fliped_vertically_file = 'fliped_vertically_' . $this->file;
+            imagedestroy($this->data);
+            $this->flip_vertically = true;
+        }
+    }
+
+    public function flip_image_horizontally(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+            imageflip($this->data, IMG_FLIP_HORIZONTAL);
+
+            imagejpeg($this->data, 'manipulated_image/fliped_horizontal_' . $this->file, 100);
+            $this->fliped_horizontally_file = 'fliped_horizontal_' . $this->file;
+            imagedestroy($this->data);
+            $this->flip_horizontally = true;
+        }
+    }
+
     /**
      * Save file
      *
@@ -227,6 +272,9 @@ $img->add_text_on_image();
 $img->add_stamp_on_image();
 $img->add_watermark_on_image();
 $img->create_thumbnail();
+$img->crop_image();
+$img->flip_image_vertically();
+$img->flip_image_horizontally();
 
 //echo "<pre>";
 //print_r($image_info);
@@ -292,6 +340,22 @@ if ($img->thumbnailed == true){
     echo '<br/><h3>Thumbnail of the Pic</h3></br>';
     echo "<img src='manipulated_image/$img->thumbnail_file' >";
 }
+
+if ($img->croped == true){
+    echo '<br/><h3>Croped Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->croped_file' >";
+}
+
+if ($img->flip_vertically == true){
+    echo '<br/><h3>flip_vertically Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->fliped_vertically_file' width='500' height='333' >";
+}
+
+if ($img->flip_horizontally == true){
+    echo '<br/><h3>flip_horizontally Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->fliped_horizontally_file' width='500' height='333' >";
+}
+
 
 ?>
 
