@@ -3,9 +3,9 @@
 class Image_Manipulation{
     public $file;
     private  $data;
-    public $rotation = false; public $resize = false; public $texted = false;
+    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false;
 
-    public $rotated_file; public $resize_file; public $texted_file;
+    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file;
 
     public $rotation_deg;
 
@@ -64,10 +64,9 @@ class Image_Manipulation{
         }
     }
 
-    public function add_text_to_image(){
+    public function add_text_on_image(){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
-//            $whitecolor = imagecolorallocate($this->data, 25, 233, 12);
             $bluecolor = imagecolorallocate($this->data, 0, 0, 255);
             imagestring($this->data, 5, 500, 500, 'Copyrights balustor.net', $bluecolor);
 
@@ -77,6 +76,33 @@ class Image_Manipulation{
             imagedestroy($this->data);
 
             $this->texted = true;
+        }
+    }
+
+    public function add_stamp_on_image(){
+        if(isset($this->file)) {
+            $stamp = imagecreatefrompng('images/copyright.png');
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $right = 100;
+            $bottom = 400;
+
+            // imagesx and imagesy Returns the width of the given image resource.
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+//            $sx = 1600;
+//            $sy = 1600;
+
+            // Copy the stamp image onto our photo using the margin offsets and the photo
+            // width to calculate positioning of the stamp.
+            imagecopy($this->data, $stamp, imagesx($this->data) - $sx - $right, imagesy($this->data) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+
+            imagejpeg($this->data, 'manipulated_image/stamped_' . $this->file, 100);
+            $this->stamped_file = 'stamped_' . $this->file;
+            imagedestroy($this->data);
+
+            $this->stamped = true;
         }
     }
 
@@ -144,7 +170,8 @@ $img->upload_image();
 $img->rotate_image($img->rotation_deg);
 $img->resize_image();
 
-$img->add_text_to_image();
+$img->add_text_on_image();
+$img->add_stamp_on_image();
 
 //echo "<pre>";
 //print_r($image_info);
@@ -193,8 +220,14 @@ if ($img->resize == true){
 
 if ($img->texted == true){
     echo '<br/><h3>Added text on Pic</h3></br>';
-    echo "<img src='manipulated_image/$img->texted_file' width='500' height='333'>";
+    echo "<img src='manipulated_image/$img->texted_file' >";
 }
+
+if ($img->stamped == true){
+    echo '<br/><h3>Added stamp on Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->stamped_file' width='500' height='333' >";
+}
+
 ?>
 
 </body>
