@@ -3,9 +3,9 @@
 class Image_Manipulation{
     public $file;
     private  $data;
-    public $rotation = false; public $resize = false;
+    public $rotation = false; public $resize = false; public $texted = false;
 
-    public $rotated_file; public $resize_file;
+    public $rotated_file; public $resize_file; public $texted_file;
 
     public $rotation_deg;
 
@@ -61,6 +61,22 @@ class Image_Manipulation{
             imagedestroy($new_image);
 
             $this->resize = true;
+        }
+    }
+
+    public function add_text_to_image(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+//            $whitecolor = imagecolorallocate($this->data, 25, 233, 12);
+            $bluecolor = imagecolorallocate($this->data, 0, 0, 255);
+            imagestring($this->data, 5, 500, 500, 'Copyrights balustor.net', $bluecolor);
+
+            imagejpeg($this->data, 'manipulated_image/texted_' . $this->file, 100);
+            $this->texted_file = 'texted_' . $this->file;
+
+            imagedestroy($this->data);
+
+            $this->texted = true;
         }
     }
 
@@ -128,6 +144,8 @@ $img->upload_image();
 $img->rotate_image($img->rotation_deg);
 $img->resize_image();
 
+$img->add_text_to_image();
+
 //echo "<pre>";
 //print_r($image_info);
 //echo "</pre>";
@@ -171,6 +189,11 @@ if ($img->rotation == true){
 if ($img->resize == true){
     echo '<br/><h3>Resized Pic</h3></br>';
     echo "<img src='manipulated_image/$img->resize_file' >";
+}
+
+if ($img->texted == true){
+    echo '<br/><h3>Added text on Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->texted_file' width='500' height='333'>";
 }
 ?>
 
