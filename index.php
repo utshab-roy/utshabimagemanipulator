@@ -3,9 +3,9 @@
 class Image_Manipulation{
     public $file;
     private  $data;
-    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false;
+    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false; public $watermarked = false;
 
-    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file;
+    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file; public $watermarked_file;
 
     public $rotation_deg;
 
@@ -106,6 +106,37 @@ class Image_Manipulation{
         }
     }
 
+
+    public function add_watermark_on_image(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+
+            // First we create our stamp image manually from GD
+            $stamp = imagecreatetruecolor(200, 70);
+
+            imagefilledrectangle($stamp, 0, 0, 199, 169, 0x0000FF);
+            imagefilledrectangle($stamp, 9, 9, 190, 60, 0xFFFFFF);
+            imagestring($stamp, 5, 20, 20, 'Balustor Blog', 0x0000FF);
+            imagestring($stamp, 3, 20, 40, '(c) 2018', 0x0000FF);
+
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $right = 20;
+            $bottom = 20;
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+
+            // Merge the stamp onto our photo with an opacity of 50%
+            imagecopymerge($this->data, $stamp, imagesx($this->data) - $sx - $right, imagesy($this->data) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp), 40);
+
+            // Save the image to file and free memory
+            imagejpeg($this->data, 'manipulated_image/watermarked_' . $this->file, 100);
+            $this->watermarked_file = 'watermarked_' . $this->file;
+
+            imagedestroy($this->data);
+            $this->watermarked = true;
+        }
+    }
+
     /**
      * Save file
      *
@@ -172,6 +203,7 @@ $img->resize_image();
 
 $img->add_text_on_image();
 $img->add_stamp_on_image();
+$img->add_watermark_on_image();
 
 //echo "<pre>";
 //print_r($image_info);
@@ -227,6 +259,12 @@ if ($img->stamped == true){
     echo '<br/><h3>Added stamp on Pic</h3></br>';
     echo "<img src='manipulated_image/$img->stamped_file' width='500' height='333' >";
 }
+
+if ($img->watermarked == true){
+    echo '<br/><h3>Added watermark on Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->watermarked_file' width='500' height='333' >";
+}
+
 
 ?>
 
