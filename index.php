@@ -3,15 +3,20 @@
 class Image_Manipulation{
     public $file;
     private  $data;
+//  boolean variables
+    public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally = false;
 
-    public $rotation = false; public $resize = false; public $texted = false; public $stamped = false;
-    public $watermarked = false; public $thumbnailed = false; public $croped = false; public $flip_vertically = false; public $flip_horizontally = false;
+//  variables to store the name of the files
+    public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file;
 
-
-    public $rotated_file; public $resize_file; public $texted_file; public $stamped_file;
-    public $watermarked_file; public $thumbnail_file; public $croped_file; public $fliped_vertically_file; public $fliped_horizontally_file;
-
+//  rotation degree value
     public $rotation_deg;
+//    resize values for resizing the pic height and width
+    public $resize_width, $resize_height;
+//    text on the pic ture
+    public $text_on_pic;
+//    thumb ratio value
+    public $thumb_ratio;
 
     public function __construct()
     {
@@ -44,7 +49,7 @@ class Image_Manipulation{
 
     }
 
-    public function resize_image(){
+    public function resize_image($width_ratio, $height_ratio){
         if(isset($this->file)){
             $this->data = imagecreatefromjpeg('images/'.$this->file);
             $image_info = getimagesize('images/'.$this->file);
@@ -53,8 +58,8 @@ class Image_Manipulation{
             $height = $image_info[1];    // height of the image
 
             //resizing the image
-            $new_width  = round ($width * 0.5);
-            $new_height = round ($height * 0.5);
+            $new_width  = round ($width * $width_ratio);
+            $new_height = round ($height * $height_ratio);
 
             //creating a new image
             $new_image = imagecreate($new_width, $new_height);
@@ -68,11 +73,11 @@ class Image_Manipulation{
         }
     }
 
-    public function add_text_on_image(){
+    public function add_text_on_image($text){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
             $bluecolor = imagecolorallocate($this->data, 0, 0, 255);
-            imagestring($this->data, 5, 500, 500, 'Copyrights balustor.net', $bluecolor);
+            imagestring($this->data, 5, 500, 500, $text, $bluecolor);
 
             imagejpeg($this->data, 'manipulated_image/texted_' . $this->file, 100);
             $this->texted_file = 'texted_' . $this->file;
@@ -141,15 +146,15 @@ class Image_Manipulation{
         }
     }
 
-    public function create_thumbnail(){
+    public function create_thumbnail($thumb_ratio){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
 
             $width = imagesx($this->data);
             $height = imagesy($this->data);
 
-            $thumb_width = intval($width / 5);
-            $thumb_height = intval($height / 5);
+            $thumb_width = intval($width / $thumb_ratio);
+            $thumb_height = intval($height / $thumb_ratio);
 
             $thumbnail = imagecreatetruecolor($thumb_width, $thumb_height);
 
@@ -264,14 +269,40 @@ if(isset($_POST['rotate']) && intval($_POST['rotate']) >0){
     $img->rotation_deg = 90;
 }
 
+if(isset($_POST['resize_width']) && floatval($_POST['resize_width']) > 0){
+    $img->resize_width = floatval($_POST['resize_width']);
+}else{
+    $img->resize_width = 0.5;
+}
+
+if(isset($_POST['resize_height']) && floatval($_POST['resize_height']) > 0){
+    $img->resize_height = floatval($_POST['resize_height']);
+}else{
+    $img->resize_height = 0.5;
+}
+
+if(isset($_POST['text_on_pic'])){
+    $img->text_on_pic = strval($_POST['text_on_pic']);
+}else{
+    $img->text_on_pic = 'default text';
+}
+
+
+if(isset($_POST['thumbnail_ratio']) && intval($_POST['thumbnail_ratio']) > 0){
+    $img->thumb_ratio = intval($_POST['thumbnail_ratio']);
+}else{
+    $img->thumb_ratio = 5;
+}
+
+
 $img->upload_image();
 $img->rotate_image($img->rotation_deg);
-$img->resize_image();
+$img->resize_image($img->resize_width, $img->resize_height);
 
-$img->add_text_on_image();
+$img->add_text_on_image($img->text_on_pic);
 $img->add_stamp_on_image();
 $img->add_watermark_on_image();
-$img->create_thumbnail();
+$img->create_thumbnail($img->thumb_ratio);
 $img->crop_image();
 $img->flip_image_vertically();
 $img->flip_image_horizontally();
@@ -297,10 +328,29 @@ $img->flip_image_horizontally();
 <body>
 
 <form action="" method="POST" enctype="multipart/form-data">
-    <input type="file" name="image"/>
 
-    <label for="rotation_degree"><b>Rotation Degree(default 90):</b></label>
-    <input type="text" placeholder="degree value" name="rotate" value="" id="rotation_degree"/>
+    <div class="form-group">
+        <label for="exampleFormControlFile1">Example file input</label>
+        <input type="file" name="image" class="form-control-file" id="exampleFormControlFile1">
+    </div>
+
+    <div class="col-6 mb-2">
+        <label for="rotation_degree"><b>Rotation Degree(default 90):</b></label>
+        <input type="text" class="form-control" name="rotate" value="" id="rotation_degree" placeholder="degree value">
+<!--    </div>-->
+
+<!--    <div class="form-inline mb-2 col-12">-->
+        <label for="resize"><b>Resize width(ratio to original pic):</b></label>
+        <input type="text" class="form-control" name="resize_width" value="" id="resize_width" placeholder="width value">
+        <label for="resize"><b>Resize height(ratio to original pic):</b></label>
+        <input type="text" class="form-control" name="resize_height" value="" id="resize_height" placeholder="height value">
+
+        <label for="text_on_pic"><b>Text we want on the pic :</b></label>
+        <input type="text" class="form-control" name="text_on_pic" value="" id="text_on_pic" placeholder="Text field">
+
+        <label for="thumbnail"><b>Thumbnail Ratio (default value 5):</b></label>
+        <input type="text" class="form-control" name="thumbnail_ratio" value="" id="thumbnail" placeholder="thumbnail ratio">
+    </div>
 
     <input class="btn btn-danger" type="submit"/>
 </form>
