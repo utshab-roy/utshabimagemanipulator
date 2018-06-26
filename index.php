@@ -13,7 +13,7 @@ class Image_Manipulation{
     public $rotation_deg;
 //    resize values for resizing the pic height and width
     public $resize_width, $resize_height;
-//    text on the pic ture
+//    text on the pic
     public $text_on_pic;
 //    thumb ratio value
     public $thumb_ratio;
@@ -29,7 +29,7 @@ class Image_Manipulation{
 
 
     /**
-     * Rotate image by degree
+     * Rotate image by degree the parameter takes a int value
      *
      * @param int $deg
      */
@@ -48,6 +48,12 @@ class Image_Manipulation{
         }
 
     }
+
+    /**
+     * resize the original image. these two variables provides the ratio of the width and height
+     * @param float $width_ratio
+     * @param float $height_ratio
+     */
 
     public function resize_image($width_ratio, $height_ratio){
         if(isset($this->file)){
@@ -73,6 +79,10 @@ class Image_Manipulation{
         }
     }
 
+    /**
+     * this will add text on the image and the text will be taken as string
+     * @param $text
+     */
     public function add_text_on_image($text){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
@@ -87,6 +97,11 @@ class Image_Manipulation{
             $this->texted = true;
         }
     }
+
+    /**
+     * this method will add a image on the original pic. temp pic been copied and paste on the original pic.
+     * here right and bottom variable just positioning the stamp
+     */
 
     public function add_stamp_on_image(){
         if(isset($this->file)) {
@@ -115,6 +130,10 @@ class Image_Manipulation{
         }
     }
 
+    /**
+     * this method will add watermark on the original pic
+     * the watermark pic has to provide
+     */
 
     public function add_watermark_on_image(){
         if(isset($this->file)) {
@@ -146,6 +165,10 @@ class Image_Manipulation{
         }
     }
 
+    /**
+     * creates the thumbnail of the image and the ratio to shorter the pic
+     * @param $thumb_ratio
+     */
     public function create_thumbnail($thumb_ratio){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
@@ -168,13 +191,18 @@ class Image_Manipulation{
         }
     }
 
+    /**
+     * this method crop the image, the max limit is the min size between the height & width
+     * right now it will crop like a square of the min size of height or width
+     */
+
     public function crop_image(){
         if(isset($this->file)) {
             $this->data = imagecreatefromjpeg('images/' . $this->file);
             $size = min(imagesx($this->data), imagesy($this->data));
 
 
-            $im2 = imagecrop($this->data, ['x' => 0, 'y' => 0, 'width' => ($size - 100), 'height' => ($size - 300)]);
+            $im2 = imagecrop($this->data, ['x' => 0, 'y' => 0, 'width' => ($size), 'height' => ($size)]);
             if ($im2 !== FALSE) {
                 imagejpeg($im2, 'manipulated_image/croped_' . $this->file, 100);
                 $this->croped_file = 'croped_' . $this->file;
@@ -184,6 +212,10 @@ class Image_Manipulation{
             $this->croped = true;
         }
     }
+
+    /**
+     * this method will flip the image vertically
+     */
 
     public function flip_image_vertically(){
         if(isset($this->file)) {
@@ -196,6 +228,10 @@ class Image_Manipulation{
             $this->flip_vertically = true;
         }
     }
+
+    /**
+     * this will flip the image horizontally
+     */
 
     public function flip_image_horizontally(){
         if(isset($this->file)) {
@@ -258,8 +294,10 @@ class Image_Manipulation{
 
 }
 
-
-
+//this will create the manipulated_image folder it not exists.
+if (!file_exists('manipulated_image')) {
+    mkdir('manipulated_image', 0777, true);
+}
 
 $img = new Image_Manipulation();
 
@@ -281,10 +319,10 @@ if(isset($_POST['resize_height']) && floatval($_POST['resize_height']) > 0){
     $img->resize_height = 0.5;
 }
 
-if(isset($_POST['text_on_pic'])){
+if(isset($_POST['text_on_pic']) && strval($_POST['text_on_pic']) != ''){
     $img->text_on_pic = strval($_POST['text_on_pic']);
 }else{
-    $img->text_on_pic = 'default text';
+    $img->text_on_pic = 'default text: balustor.com';
 }
 
 
