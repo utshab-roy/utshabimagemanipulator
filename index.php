@@ -285,7 +285,7 @@ class Image_Manipulation{
     public function watermark_two(){
         if(isset($this->file)) {
             // Load the stamp and the photo to apply the watermark to
-            $stamp = imagecreatefrompng('images/copyright.png');
+            $stamp = $this->resize_img(.2, .2,'books2.jpg');
             $this->data = imagecreatefromjpeg('images/' . $this->file);
 
             // Set the margins for the stamp and get the height/width of the stamp image
@@ -304,6 +304,46 @@ class Image_Manipulation{
             imagedestroy($this->data);
             $this->watermarked2 = true;
         }
+    }
+
+    /**
+     * this method resize the image and returns the image file resource
+     * @param $width_ratio
+     * @param $height_ratio
+     * @param $img_filename
+     * @return resource
+     */
+
+    public function resize_img($width_ratio, $height_ratio, $img_filename){
+
+        //checks the file extension
+        $tmp = explode('.', $img_filename);
+        $file_ext = end($tmp);
+
+        if ($file_ext == 'png'){
+            $img = imagecreatefrompng('images/' . $img_filename);
+        }elseif ($file_ext == 'jpg'){
+            $img = imagecreatefromjpeg('images/' . $img_filename);
+        }
+        $image_info = getimagesize('images/'.$img_filename);
+
+        $width  = $image_info[0];    // width of the image
+        $height = $image_info[1];    // height of the image
+
+        //resizing the image
+        $new_width  = round ($width * $width_ratio);
+        $new_height = round ($height * $height_ratio);
+
+        //creating a new image
+        $new_image = imagecreate($new_width, $new_height);
+        imagecopyresized($new_image, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+        if ($file_ext == 'png'){
+            imagepng($new_image,'manipulated_image/resized_img_'.$img_filename, 9);
+        }elseif ($file_ext == 'jpg'){
+            imagejpeg($new_image,'manipulated_image/resized_img_'.$img_filename, 100);
+        }
+        return $new_image;
     }
 
     /**
