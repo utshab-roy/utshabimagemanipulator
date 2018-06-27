@@ -4,10 +4,10 @@ class Image_Manipulation{
     public $file;
     private  $data;
 //  boolean variables
-    public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally = false;
+    public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2 = false;
 
 //  variables to store the name of the files
-    public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file;
+    public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file;
 
 //  rotation degree value
     public $rotation_deg;
@@ -246,6 +246,67 @@ class Image_Manipulation{
     }
 
     /**
+     * this method convert the original picture to gray scale
+     */
+    public function gray_scale(){
+        if(isset($this->file)) {
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+
+            $width = imagesx($this->data);
+            $height = imagesy($this->data);
+
+            for ($i=0; $i<$width; $i++)
+            {
+                for ($j=0; $j<$height; $j++)
+                {
+                    // get the rgb value for current pixel
+                    $rgb = ImageColorAt($this->data, $i, $j);
+                    // extract each value for r, g, b
+                    $rr = ($rgb >> 16) & 0xFF;
+                    $gg = ($rgb >> 8) & 0xFF;
+                    $bb = $rgb & 0xFF;
+                    // get the Value from the RGB value
+                    $g = round(($rr + $gg + $bb) / 3);
+                    // grayscale values have r=g=b=g
+                    $val = imagecolorallocate($this->data, $g, $g, $g);
+                    // set the gray value
+                    imagesetpixel ($this->data, $i, $j, $val);
+                }
+            }
+
+            imagejpeg($this->data, 'manipulated_image/gray_' . $this->file, 100);
+            $this->gray_pic_file = 'gray_' . $this->file;
+            imagedestroy($this->data);
+            $this->grayed = true;
+
+        }
+    }
+
+    public function watermark_two(){
+        if(isset($this->file)) {
+            // Load the stamp and the photo to apply the watermark to
+            $stamp = imagecreatefrompng('images/copyright.png');
+            $this->data = imagecreatefromjpeg('images/' . $this->file);
+
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $marge_right = 10;
+            $marge_bottom = 10;
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+
+            // Copy the stamp image onto our photo using the margin offsets and the photo
+            // width to calculate positioning of the stamp.
+            imagecopy($this->data, $stamp, imagesx($this->data) - $sx - $marge_right, imagesy($this->data) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+
+            // Output and free memory
+            imagejpeg($this->data, 'manipulated_image/watermark2_' . $this->file, 100);
+            $this->watermarked2_file = 'watermark2_' . $this->file;
+            imagedestroy($this->data);
+            $this->watermarked2 = true;
+        }
+    }
+
+    /**
      * Save file
      *
      * @param string $file_output  if empty then main image will saved, if not image will be saved as this new name
@@ -344,6 +405,8 @@ $img->create_thumbnail($img->thumb_ratio);
 $img->crop_image();
 $img->flip_image_vertically();
 $img->flip_image_horizontally();
+$img->gray_scale();
+$img->watermark_two();
 
 //echo "<pre>";
 //print_r($image_info);
@@ -388,9 +451,11 @@ $img->flip_image_horizontally();
 
         <label for="thumbnail"><b>Thumbnail Ratio (default value 5):</b></label>
         <input type="text" class="form-control" name="thumbnail_ratio" value="" id="thumbnail" placeholder="thumbnail ratio">
+
+        <input class="btn btn-danger mt-3" type="submit"/>
     </div>
 
-    <input class="btn btn-danger" type="submit"/>
+
 </form>
 
 <?php
@@ -442,6 +507,16 @@ if ($img->flip_vertically == true){
 if ($img->flip_horizontally == true){
     echo '<br/><h3>flip_horizontally Pic</h3></br>';
     echo "<img src='manipulated_image/$img->fliped_horizontally_file' width='500' height='333' >";
+}
+
+if ($img->grayed == true){
+    echo '<br/><h3>Gray Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->gray_pic_file' width='500' height='333' >";
+}
+
+if($img->watermarked2 == true){
+    echo '<br/><h3>Watermarked 2 Pic</h3></br>';
+    echo "<img src='manipulated_image/$img->watermarked2_file' width='500' height='333' >";
 }
 
 
