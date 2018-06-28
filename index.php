@@ -49,8 +49,11 @@ $img->add_stamp_on_image();
 $img->add_watermark_on_image();
 $img->create_thumbnail($img->thumb_ratio);
 $img->crop_image();
-$img->flip_image_vertically();
-$img->flip_image_horizontally();
+//$img->flip_image_vertically();
+//$img->flip_image_horizontally();
+$img->flip_image('x');
+$img->flip_image('y');
+$img->flip_image('both');
 $img->gray_scale();
 $img->watermark_two();
 
@@ -153,6 +156,11 @@ if ($img->flip_vertically == true){
 if ($img->flip_horizontally == true){
     echo '<br/><h3>flip_horizontally Pic</h3></br>';
     echo "<img src='manipulated_image/$img->fliped_horizontally_file' width='500' height='333' >";
+}
+
+if($img->flip_both == true){
+    echo '<br/><h3>Flip Both</h3></br>';
+    echo "<img src='manipulated_image/$img->fliped_both_file' width='500' height='333' >";
 }
 
 if ($img->grayed == true){

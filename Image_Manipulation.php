@@ -4,10 +4,10 @@ namespace Image{
         public $file;
         private  $data;
 //  boolean variables
-        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2 = false;
+        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both = false;
 
 //  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file;
+        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file;
 
 //  rotation degree value
         public $rotation_deg;
@@ -38,9 +38,14 @@ namespace Image{
             if(isset($this->file)){
                 $deg = floatval($deg);
                 $this->data = imagecreatefromjpeg('images/'.$this->file);
+                //getting the file extension
+                $file_ext = $this->get_file_extension($this->file);
+                //creating the image according to file type
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
                 imagesetinterpolation($this->data, IMG_BELL);
                 $image_rotated = imagerotate($this->data, $deg, 0);
-                imagejpeg($image_rotated, 'manipulated_image/rotated_'.$this->file, 100);
+                //saving the file with prefix
+                $this->save_file($image_rotated,'rotated_',$this->file,$file_ext);
                 $this->rotated_file = 'rotated_'.$this->file;
                 imagedestroy($this->data);
 
@@ -85,15 +90,18 @@ namespace Image{
          */
         public function add_text_on_image($text){
             if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
+                //getting the file extension
+                $file_ext = $this->get_file_extension($this->file);
+                //creating the image according to file type
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
                 $bluecolor = imagecolorallocate($this->data, 0, 0, 255);
                 imagestring($this->data, 5, 500, 500, $text, $bluecolor);
 
-                imagejpeg($this->data, 'manipulated_image/texted_' . $this->file, 100);
+                //saving the file with prefix
+                $this->save_file($this->data,'texted_', $this->file, $file_ext);
+
                 $this->texted_file = 'texted_' . $this->file;
-
                 imagedestroy($this->data);
-
                 $this->texted = true;
             }
         }
@@ -214,34 +222,39 @@ namespace Image{
         }
 
         /**
-         * this method will flip the image vertically
+         * this method will flip the image according to the direction
+         * x-> HORIZONTAL
+         * y-> VERTICAL
+         * both-> FLIP_BOTH
+         * @param $direction
          */
-
-        public function flip_image_vertically(){
+        public function flip_image($direction){
             if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-                imageflip($this->data, IMG_FLIP_VERTICAL);
-
-                imagejpeg($this->data, 'manipulated_image/fliped_vertically_' . $this->file, 100);
-                $this->fliped_vertically_file = 'fliped_vertically_' . $this->file;
-                imagedestroy($this->data);
-                $this->flip_vertically = true;
-            }
-        }
-
-        /**
-         * this will flip the image horizontally
-         */
-
-        public function flip_image_horizontally(){
-            if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-                imageflip($this->data, IMG_FLIP_HORIZONTAL);
-
-                imagejpeg($this->data, 'manipulated_image/fliped_horizontal_' . $this->file, 100);
-                $this->fliped_horizontally_file = 'fliped_horizontal_' . $this->file;
-                imagedestroy($this->data);
-                $this->flip_horizontally = true;
+                $file_ext = $this->get_file_extension($this->file);
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
+                switch ($direction){
+                    case 'x':
+                        imageflip($this->data, IMG_FLIP_HORIZONTAL);
+                        $this->save_file($this->data,'fliped_horizontal_',$this->file,$file_ext);
+                        $this->fliped_horizontally_file = 'fliped_horizontal_' . $this->file;
+                        imagedestroy($this->data);
+                        $this->flip_horizontally = true;
+                        break;
+                    case 'y':
+                        imageflip($this->data, IMG_FLIP_VERTICAL);
+                        $this->save_file($this->data,'fliped_vertical_',$this->file,$file_ext);
+                        $this->fliped_vertically_file = 'fliped_vertical_' . $this->file;
+                        imagedestroy($this->data);
+                        $this->flip_vertically = true;
+                        break;
+                    case 'both':
+                        imageflip($this->data, IMG_FLIP_BOTH);
+                        $this->save_file($this->data,'fliped_both_',$this->file,$file_ext);
+                        $this->fliped_both_file = 'fliped_both_' . $this->file;
+                        imagedestroy($this->data);
+                        $this->flip_both = true;
+                        break;
+                }
             }
         }
 
