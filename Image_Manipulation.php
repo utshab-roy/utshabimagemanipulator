@@ -33,7 +33,7 @@ namespace Image{
          *
          * @param int $deg
          */
-        public function rotate_image($deg){
+        public function rotate_image($deg = 45){
 
             if(isset($this->file)){
                 $deg = floatval($deg);
@@ -55,7 +55,7 @@ namespace Image{
          * @param float $height_ratio
          */
 
-        public function resize_image($width_ratio, $height_ratio){
+        public function resize_image($width_ratio = 0.5, $height_ratio = 0.5){
             if(isset($this->file)){
                 $this->data = imagecreatefromjpeg('images/'.$this->file);
                 $image_info = getimagesize('images/'.$this->file);
@@ -250,7 +250,11 @@ namespace Image{
          */
         public function gray_scale(){
             if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
+                //getting the file extension of the image
+                $file_ext = $this->get_file_extension($this->file);
+
+                //creating the image
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
 
                 $width = imagesx($this->data);
                 $height = imagesy($this->data);
@@ -274,11 +278,10 @@ namespace Image{
                     }
                 }
 
-                imagejpeg($this->data, 'manipulated_image/gray_' . $this->file, 100);
+                $this->save_file($this->data,'gray_',$this->file,$file_ext);
                 $this->gray_pic_file = 'gray_' . $this->file;
                 imagedestroy($this->data);
                 $this->grayed = true;
-
             }
         }
 
@@ -317,14 +320,16 @@ namespace Image{
 
             $file_ext = $this->get_file_extension($img_filename);
 
-            switch ($file_ext){
-                case 'png':
-                    $img = imagecreatefrompng('images/' . $img_filename);
-                    break;
-                case 'jpg':
-                    $img = imagecreatefromjpeg('images/' . $img_filename);
-                    break;
-            }
+            $img = $this->image_create_according_to_file_extension($img_filename,$file_ext);
+
+//            switch ($file_ext){
+//                case 'png':
+//                    $img = imagecreatefrompng('images/' . $img_filename);
+//                    break;
+//                case 'jpg':
+//                    $img = imagecreatefromjpeg('images/' . $img_filename);
+//                    break;
+//            }
 
             $image_info = getimagesize('images/'.$img_filename);
 
@@ -339,14 +344,7 @@ namespace Image{
             $new_image = imagecreate($new_width, $new_height);
             imagecopyresized($new_image, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 
-            switch ($file_ext){
-                case 'png':
-                    imagepng($new_image,'manipulated_image/resized_img_'.$img_filename, 9);
-                    break;
-                case 'jpg':
-                    imagejpeg($new_image,'manipulated_image/resized_img_'.$img_filename, 100);
-                    break;
-            }
+            $this->save_file($new_image, 'resized_img_',$img_filename,$file_ext);
 
             return $new_image;
         }
@@ -364,12 +362,42 @@ namespace Image{
         }
 
         /**
-         * Save file
-         *
-         * @param string $file_output  if empty then main image will saved, if not image will be saved as this new name
+         *this method saves the image according to it's file type
+         * have to provide the image file, prefix text that is going to add before the image file name
+         * the original file name that will be the last part of the manipulated image
+         * and last the file extension for the type of the image
+         * @param $new_image
+         * @param $prefix_of_filename
+         * @param $original_filename
+         * @param $file_ext
          */
-        public function save_file($file_output = ''){
-//        echo 'hello world';
+        public function save_file($new_image, $prefix_of_filename, $original_filename, $file_ext){
+            switch ($file_ext){
+                case 'png':
+                    imagepng($new_image,'manipulated_image/'.$prefix_of_filename.$original_filename, 9);
+                    break;
+                case 'jpg':
+                    imagejpeg($new_image,'manipulated_image/'.$prefix_of_filename.$original_filename, 100);
+                    break;
+            }
+        }
+
+        /**
+         * @param $img_filename
+         * @param $file_ext
+         * @return resource
+         */
+        public function image_create_according_to_file_extension($img_filename,$file_ext){
+
+            switch ($file_ext){
+                case 'png':
+                    $img = imagecreatefrompng('images/' . $img_filename);
+                    break;
+                case 'jpg':
+                    $img = imagecreatefromjpeg('images/' . $img_filename);
+                    break;
+            }
+            return $img;
         }
 
 
