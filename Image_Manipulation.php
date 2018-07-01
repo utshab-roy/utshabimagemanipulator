@@ -4,10 +4,10 @@ namespace Image{
         public $file;
         private  $data;
 //  boolean variables
-        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected = false;
+        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected, $bestFit = false;
 
 //  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file, $effected_file;
+        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file, $effected_file,$bestFit_file;
 
 //  rotation degree value
         public $rotation_deg;
@@ -514,6 +514,79 @@ namespace Image{
                         break;
                 }
             }
+        }
+
+        /**
+         * this method will change the image to best fit, according to it's orientation.
+         * it has some bug. Need tobe fixed. I believe the bug is on the  imagecopyresampled method
+         * @param int $maxWidth
+         * @param int $maxHeight
+         */
+
+        public function best_fit($maxWidth = 300, $maxHeight = 300){
+            if(isset($this->file)) {
+                //getting the file extension of the image
+                $file_ext = $this->get_file_extension($this->file);
+                //creating the image instances
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
+
+                //getting the width and the height of the image
+                $width = imagesx($this->data);
+                $height = imagesy($this->data);
+
+                // If the image already fits, there's nothing to do
+                if($width <= $maxWidth && $height <= $maxHeight) {
+                    $this->save_file($this->data,'bestFit_', $this->file, $file_ext);
+                    $this->bestFit_file = 'bestFit_'.$this->file;
+                    imagedestroy($this->data);
+                    $this->bestFit = true;
+                }
+                else{
+                    //get the orientation of the image
+                    //landscape orientation
+                    if($width > $height){
+                        $width = $maxWidth;
+                        $height = $maxWidth / $this->getAspectRatio($this->data);
+                    }
+                    //portrait orientation
+                    elseif($width < $height){
+                        $height = $maxHeight;
+                        $width = $maxHeight * $this->getAspectRatio($this->data);
+                    }
+                    //square orientation
+                    else{
+                        $height = $maxHeight;
+                        $width = $maxWidth;
+                    }
+
+                    // Reduce to max width
+                    if($width > $maxWidth) {
+                        $width = $maxWidth;
+                        $height = $width / $this->getAspectRatio($this->data);
+                    }
+
+                    // Reduce to max height
+                    if($height > $maxHeight) {
+                        $height = $maxHeight;
+                        $width = $height * $this->getAspectRatio($this->data);
+                    }
+
+                    //resizing the image file...
+                    $destination = imagecreatetruecolor($width, $height);
+                    imagecopyresampled($destination, $this->data, 0, 0, 0, 0, $width, $height, $width, $height);
+
+                    //saving the image file
+                    $this->save_file($destination,'bestFit_', $this->file, $file_ext);
+                    $this->bestFit_file = 'bestFit_'.$this->file;
+                    imagedestroy($this->data);
+                    imagedestroy($destination);
+                    $this->bestFit = true;
+                }
+            }
+        }
+
+        public function getAspectRatio($image){
+            return imagesx($image) / imagesy($image);
         }
 
 

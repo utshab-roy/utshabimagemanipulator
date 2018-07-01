@@ -59,6 +59,7 @@ $img->upload_image();
 $img->add_border_to_image(5, 124, 34, 200);
 //$img->add_effect_on_image('colorize', '',0,0,200,50);
 $img->add_effect_on_image('colorize',30);
+$img->best_fit(500, 500);
 
 //echo "<pre>";
 //print_r($image_info);
@@ -185,6 +186,12 @@ if($img->effected == true){
     echo '<br/><h3>Effected Image</h3></br>';
     echo "<img src='manipulated_image/$img->effected_file' width='500' height='333' >";
 }
+
+if($img->bestFit == true){
+    echo '<br/><h3>Best Fit</h3></br>';
+    echo "<img src='manipulated_image/$img->bestFit_file' >";
+}
+
 
 
 
