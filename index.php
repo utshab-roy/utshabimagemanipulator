@@ -41,22 +41,24 @@ if(isset($_POST['thumbnail_ratio']) && intval($_POST['thumbnail_ratio']) > 0){
 
 
 $img->upload_image();
-$img->rotate_image($img->rotation_deg);
-$img->resize_image($img->resize_width, $img->resize_height);
-
-$img->add_text_on_image($img->text_on_pic);
-$img->add_stamp_on_image();
-$img->add_watermark_on_image();
-$img->create_thumbnail($img->thumb_ratio);
-$img->crop_image();
-//$img->flip_image_vertically();
-//$img->flip_image_horizontally();
-$img->flip_image('x');
-$img->flip_image('y');
-$img->flip_image('both');
-$img->gray_scale();
-$img->watermark_two();
+//$img->rotate_image($img->rotation_deg);
+//$img->resize_image($img->resize_width, $img->resize_height);
+//
+//$img->add_text_on_image($img->text_on_pic);
+//$img->add_stamp_on_image();
+//$img->add_watermark_on_image();
+//$img->create_thumbnail($img->thumb_ratio);
+//$img->crop_image();
+////$img->flip_image_vertically();
+////$img->flip_image_horizontally();
+//$img->flip_image('x');
+//$img->flip_image('y');
+//$img->flip_image('both');
+//$img->gray_scale();
+//$img->watermark_two();
 $img->add_border_to_image(5, 124, 34, 200);
+//$img->add_effect_on_image('colorize', '',0,0,200,50);
+$img->add_effect_on_image('colorize',30);
 
 //echo "<pre>";
 //print_r($image_info);
@@ -176,8 +178,12 @@ if($img->watermarked2 == true){
 
 if($img->bordered == true){
     echo '<br/><h3>Image with Border</h3></br>';
-//    var_dump($img->bordered_file);
     echo "<img src='manipulated_image/$img->bordered_file' width='500' height='333' >";
+}
+
+if($img->effected == true){
+    echo '<br/><h3>Effected Image</h3></br>';
+    echo "<img src='manipulated_image/$img->effected_file' width='500' height='333' >";
 }
 
 

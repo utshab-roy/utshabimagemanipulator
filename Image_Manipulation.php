@@ -4,10 +4,10 @@ namespace Image{
         public $file;
         private  $data;
 //  boolean variables
-        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered = false;
+        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected = false;
 
 //  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file;
+        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file, $effected_file;
 
 //  rotation degree value
         public $rotation_deg;
@@ -374,7 +374,7 @@ namespace Image{
 
                 $dest = imagecreatetruecolor($sx + $border_pixel * 2, $sy + $border_pixel * 2);
 
-                $dest = $this->border_color($dest, $red, $green, $blue);
+                $dest = $this->get_border_color($dest, $red, $green, $blue);
 
                 // Copy
                 imagecopy($dest, $this->data, $border_pixel, $border_pixel, 0, 0, $sx, $sy);
@@ -398,12 +398,124 @@ namespace Image{
          * @param $blue
          * @return mixed
          */
-        function border_color($image, $red = 0, $green = 0, $blue = 0){
+        function get_border_color($image, $red = 0, $green = 0, $blue = 0){
             // sets background to red
             $color = imagecolorallocate($image, $red, $green, $blue);
             imagefill($image, 0, 0, $color);
             return $image;
         }
+
+        /**
+         *this method will create effect on the image. Various type of effect can be imposed on the image
+         * according to the case selection. The case name refers the effect that going to apply on the image.
+         * @param $effect
+         * @param int $level
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @param int $opacity
+         */
+
+        function add_effect_on_image($effect, $level = 100, $red = 124, $green = 34, $blue = 200, $opacity =10){
+            if(isset($this->file)) {
+                //getting the file extension of the image
+                $file_ext = $this->get_file_extension($this->file);
+                //creating the image instances
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
+
+                switch ($effect){
+                    case 'blur':
+                        for ($i = 0; $i < 10; $i++){
+                        imagefilter($this->data, IMG_FILTER_GAUSSIAN_BLUR);
+                    }
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'selective_blur':
+                        for ($i = 0; $i < 10; $i++) {
+                            imagefilter($this->data, IMG_FILTER_SELECTIVE_BLUR);
+                        }
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'negative':
+                        imagefilter($this->data, IMG_FILTER_NEGATE);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'gray':
+                        imagefilter($this->data, IMG_FILTER_GRAYSCALE);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'edge_detection':
+                        imagefilter($this->data, IMG_FILTER_EDGEDETECT);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'emboss':
+                        imagefilter($this->data, IMG_FILTER_EMBOSS);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'sketchy':
+                        imagefilter($this->data, IMG_FILTER_MEAN_REMOVAL);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'brightness':
+                        imagefilter($this->data, IMG_FILTER_BRIGHTNESS, $level);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'contrast':
+                        imagefilter($this->data, IMG_FILTER_CONTRAST, $level);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'smooth':
+                        imagefilter($this->data, IMG_FILTER_SMOOTH, $level);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'pixels':
+                        imagefilter($this->data, IMG_FILTER_PIXELATE, $level,true);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                    case 'colorize':
+                        imagefilter($this->data, IMG_FILTER_COLORIZE, $red, $green, $blue, $opacity);
+                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
+                        $this->effected_file = 'effect_'.$this->file;
+                        imagedestroy($this->data);
+                        $this->effected = true;
+                        break;
+                }
+            }
+        }
+
 
         /**
          * this function returns the file extension of the file
