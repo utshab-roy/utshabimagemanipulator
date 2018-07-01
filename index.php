@@ -56,6 +56,7 @@ $img->flip_image('y');
 $img->flip_image('both');
 $img->gray_scale();
 $img->watermark_two();
+$img->add_border_to_image(5, 124, 34, 200);
 
 //echo "<pre>";
 //print_r($image_info);
@@ -172,6 +173,13 @@ if($img->watermarked2 == true){
     echo '<br/><h3>Watermarked 2 Pic</h3></br>';
     echo "<img src='manipulated_image/$img->watermarked2_file' width='500' height='333' >";
 }
+
+if($img->bordered == true){
+    echo '<br/><h3>Image with Border</h3></br>';
+//    var_dump($img->bordered_file);
+    echo "<img src='manipulated_image/$img->bordered_file' width='500' height='333' >";
+}
+
 
 
 ?>

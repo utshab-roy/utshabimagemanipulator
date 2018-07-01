@@ -4,10 +4,10 @@ namespace Image{
         public $file;
         private  $data;
 //  boolean variables
-        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both = false;
+        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered = false;
 
 //  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file;
+        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file;
 
 //  rotation degree value
         public $rotation_deg;
@@ -335,15 +335,6 @@ namespace Image{
 
             $img = $this->image_create_according_to_file_extension($img_filename,$file_ext);
 
-//            switch ($file_ext){
-//                case 'png':
-//                    $img = imagecreatefrompng('images/' . $img_filename);
-//                    break;
-//                case 'jpg':
-//                    $img = imagecreatefromjpeg('images/' . $img_filename);
-//                    break;
-//            }
-
             $image_info = getimagesize('images/'.$img_filename);
 
             $width  = $image_info[0];    // width of the image
@@ -360,6 +351,58 @@ namespace Image{
             $this->save_file($new_image, 'resized_img_',$img_filename,$file_ext);
 
             return $new_image;
+        }
+
+        /**
+         * add a border to the original image, the border size has to given as pixel
+         * and the color of the border will be according to RGB color, default border color is black
+         * @param $border_pixel
+         * @param $red
+         * @param $green
+         * @param $blue
+         */
+
+        public function add_border_to_image($border_pixel = 10, $red = 0, $green = 0, $blue = 0){
+            if(isset($this->file)) {
+                //getting the file extension of the image
+                $file_ext = $this->get_file_extension($this->file);
+                //creating the image instances
+                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
+
+                $sx = imagesx($this->data);
+                $sy = imagesy($this->data);
+
+                $dest = imagecreatetruecolor($sx + $border_pixel * 2, $sy + $border_pixel * 2);
+
+                $dest = $this->border_color($dest, $red, $green, $blue);
+
+                // Copy
+                imagecopy($dest, $this->data, $border_pixel, $border_pixel, 0, 0, $sx, $sy);
+
+                //saving the file with prefix
+                $this->save_file($dest,'border_',$this->file,$file_ext);
+                $this->bordered_file = 'border_'.$this->file;
+
+                // Output and free from memory
+                imagedestroy($dest);
+                imagedestroy($this->data);
+                $this->bordered = true;
+            }
+        }
+
+        /**
+         * takes the image and the RGB color to make the border
+         * @param $image
+         * @param $red
+         * @param $green
+         * @param $blue
+         * @return mixed
+         */
+        function border_color($image, $red = 0, $green = 0, $blue = 0){
+            // sets background to red
+            $color = imagecolorallocate($image, $red, $green, $blue);
+            imagefill($image, 0, 0, $color);
+            return $image;
         }
 
         /**
