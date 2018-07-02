@@ -56,14 +56,15 @@ $img->upload_image();
 //$img->flip_image('both');
 //$img->gray_scale();
 //$img->watermark_two();
-$img->add_border_to_image(5, 124, 34, 200);
+$img->add_border_to_image(5, 25, 141, 214);
 //$img->add_effect_on_image('colorize', '',0,0,200,50);
-$img->add_effect_on_image('colorize',30);
+$img->add_effect_on_image('colorize',30,214, 24, 97);
 $img->best_fit(500, 500);
 
-//echo "<pre>";
-//print_r($image_info);
-//echo "</pre>";
+$image = new Image\Instagram_Effect('images/books1.jpg');
+$image  ->aqua()
+        ->sepia()
+        ->sharpen();
 
 ?>
 
