@@ -364,6 +364,35 @@ namespace Image{
             return $this;
         }
 
+        /**
+         * this method create a water mark image first then merge it to the original image
+         * @param int $opacity
+         * @param int $margin_right
+         * @param int $margin_bottom
+         * @return $this
+         */
+        public function watermark_image($opacity = 40, $margin_right = 20, $margin_bottom = 20){
+            // First we create our stamp image manually from GD
+            $stamp = imagecreatetruecolor(200, 70);
+
+            imagefilledrectangle($stamp, 0, 0, 199, 169, 0x0000FF);
+            imagefilledrectangle($stamp, 9, 9, 190, 60, 0xFFFFFF);
+            imagestring($stamp, 5, 20, 20, 'Balustor Blog', 0x0000FF);
+            imagestring($stamp, 3, 20, 40, '(c) 2018', 0x0000FF);
+
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $right = $margin_right;
+            $bottom = $margin_bottom;
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+
+            // Merge the stamp onto our photo with an opacity of 50%
+            imagecopymerge($this->image, $stamp, imagesx($this->image) - $sx - $right, imagesy($this->image) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp), $opacity);
+
+            $this->save_image('waterMark_');
+            return $this;
+        }
+
 
 
 //        *******************************REWRITE END****************************************************************
@@ -427,40 +456,7 @@ namespace Image{
             }
         }
 
-        /**
-         * this method will add watermark on the original pic
-         * the watermark pic has to provide
-         */
 
-        public function add_watermark_on_image(){
-            if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-
-                // First we create our stamp image manually from GD
-                $stamp = imagecreatetruecolor(200, 70);
-
-                imagefilledrectangle($stamp, 0, 0, 199, 169, 0x0000FF);
-                imagefilledrectangle($stamp, 9, 9, 190, 60, 0xFFFFFF);
-                imagestring($stamp, 5, 20, 20, 'Balustor Blog', 0x0000FF);
-                imagestring($stamp, 3, 20, 40, '(c) 2018', 0x0000FF);
-
-                // Set the margins for the stamp and get the height/width of the stamp image
-                $right = 20;
-                $bottom = 20;
-                $sx = imagesx($stamp);
-                $sy = imagesy($stamp);
-
-                // Merge the stamp onto our photo with an opacity of 50%
-                imagecopymerge($this->data, $stamp, imagesx($this->data) - $sx - $right, imagesy($this->data) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp), 40);
-
-                // Save the image to file and free memory
-                imagejpeg($this->data, 'manipulated_image/watermarked_' . $this->file, 100);
-                $this->watermarked_file = 'watermarked_' . $this->file;
-
-                imagedestroy($this->data);
-                $this->watermarked = true;
-            }
-        }
 
         /**
          * creates the thumbnail of the image and the ratio to shorter the pic

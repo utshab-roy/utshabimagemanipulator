@@ -74,6 +74,7 @@ $img
 //    ->flip_image('both')
 //    ->border_on_image(5, 25, 141, 214)
 //    ->GD_effect('colorize')
+//    ->watermark_image(70, 30, 30)
     ->display();
 
 
