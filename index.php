@@ -70,8 +70,9 @@ $img
 //    ->sharpen()
 //    ->rotate_image(10)
 //    ->resize_image(.9, .9)
-    ->text_on_image()
-    ->flip_image('y')
+//    ->text_on_image()
+//    ->flip_image('both')
+//    ->border_on_image(5, 25, 141, 214)
     ->display();
 
 

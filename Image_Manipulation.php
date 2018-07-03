@@ -122,6 +122,7 @@ namespace Image{
 
         /**
          * this method clone the image resource GD type according to source to destination
+         * still not working perfectly
          * @param $src
          * @param $dest
          */
@@ -130,7 +131,9 @@ namespace Image{
             $height = imagesy($src);
 
             $dest = imagecreate($width,$height);
-            imagecopyresized($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
+//            imagecopyresized($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
+            imagecopy($dest, $src, 0, 0, 0, 0, $width, $height);
+
         }
 
         /**
@@ -180,8 +183,7 @@ namespace Image{
         }
         public function display_image($image){
             // Content type
-            $file_type = $this->get_file_extension($image);
-            switch ($file_type){
+            switch ($this->file_type){
                 case 'jpg':
                     header('Content-type: image/jpeg');
                     imagejpeg($image);
@@ -255,6 +257,42 @@ namespace Image{
             }
             return $this;
         }
+
+        public function border_on_image($border_pixel = 10, $red = 255, $green = 0, $blue = 0){
+            //width and height of the image
+            $width = imagesx($this->image);
+            $height = imagesy($this->image);
+
+            $dest = imagecreatetruecolor($width + $border_pixel * 2, $height + $border_pixel * 2);
+
+            $dest = $this->get_border_color($dest, $red, $green, $blue);
+
+//            $this->display_image($dest);
+
+            // Copy
+            imagecopy($dest, $this->image, $border_pixel, $border_pixel, 0, 0, $width, $height);
+//            $this->display_image($dest); //its displaying the perfect image, after cloning the pic reduce quality
+            $this->clone_image_src_dest($dest, $this->image);
+            //saving the file with prefix
+            $this->save_image('border_');
+            return $this;
+        }
+
+        /**
+         * takes the image and the RGB color to make the border
+         * @param $image
+         * @param $red
+         * @param $green
+         * @param $blue
+         * @return mixed
+         */
+        function get_border_color($image, $red = 0, $green = 0, $blue = 0){
+            // sets background to red
+            $color = imagecolorallocate($image, $red, $green, $blue);
+            imagefill($image, 0, 0, $color);
+            return $image;
+        }
+
 
 
 //        *******************************REWRITE END****************************************************************
@@ -570,20 +608,7 @@ namespace Image{
             }
         }
 
-        /**
-         * takes the image and the RGB color to make the border
-         * @param $image
-         * @param $red
-         * @param $green
-         * @param $blue
-         * @return mixed
-         */
-        function get_border_color($image, $red = 0, $green = 0, $blue = 0){
-            // sets background to red
-            $color = imagecolorallocate($image, $red, $green, $blue);
-            imagefill($image, 0, 0, $color);
-            return $image;
-        }
+
 
         /**
          *this method will create effect on the image. Various type of effect can be imposed on the image
