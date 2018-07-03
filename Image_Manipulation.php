@@ -19,7 +19,7 @@ namespace Image{
         public $thumb_ratio;
 
 
-//        **************************Insta BEGIN*********************************************************************
+//        **************************REWRITE BEGIN*********************************************************************
         protected $image;
         protected $original_image;
         protected $clone_image;
@@ -54,7 +54,6 @@ namespace Image{
 //            $this->clone_image_resource();
             imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
             $this->save_image('insta_aqua_');
-//            imagedestroy($this->image);
             return $this;
         }
 
@@ -67,7 +66,6 @@ namespace Image{
             imagefilter($this->image, IMG_FILTER_GRAYSCALE);
             imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
             $this->save_image('insta_sepia_');
-//            imagedestroy($this->image);
             return $this;
         }
 
@@ -84,7 +82,6 @@ namespace Image{
             );
             imageconvolution($this->image, $gaussian, 1, 4);
             $this->save_image('insta_sharpen_');
-//            imagedestroy($this->image);
             return $this;
         }
 
@@ -124,7 +121,9 @@ namespace Image{
         }
 
         /**
-         * this method clone the image resource GD type so that we can use it as a unique resource
+         * this method clone the image resource GD type according to source to destination
+         * @param $src
+         * @param $dest
          */
         public function clone_image_src_dest($src, &$dest){
             $width  = imagesx($src);
@@ -168,15 +167,32 @@ namespace Image{
          */
         public function display(){
             // Content type
-            header('Content-type: image/jpeg');
-            imagejpeg($this->image);
+            switch ($this->file_type){
+                case 'jpg':
+                    header('Content-type: image/jpeg');
+                    imagejpeg($this->image);
+                    break;
+                case 'png':
+                    header('Content-type: image/png');
+                    imagepng($this->image);
+                    break;
+            }
         }
         public function display_image($image){
             // Content type
-            header('Content-type: image/jpeg');
-            imagejpeg($image);
+            $file_type = $this->get_file_extension($image);
+            switch ($file_type){
+                case 'jpg':
+                    header('Content-type: image/jpeg');
+                    imagejpeg($image);
+                    break;
+                case 'png':
+                    header('Content-type: image/png');
+                    imagepng($image);
+                    break;
+            }
         }
-//        *******************************Insta END****************************************************************
+
 
         /**
          * this method suppose to rotate the image but don't know why not working
@@ -184,15 +200,20 @@ namespace Image{
          * @return $this
          */
         public function rotate_image($deg = 45.0){
-            $deg = floatval($deg);
+//            $deg = floatval($deg);
             imagerotate($this->image, $deg, 0);
             $this->save_image('rotate_');
             return $this;
         }
 
+        /**
+         * this method resize the image according to the width and height ratio
+         * @param float $width_ratio
+         * @param float $height_ratio
+         * @return $this
+         */
         public function resize_image($width_ratio = 0.1, $height_ratio = 0.1){
             $image_info = getimagesize($this->file_path);
-
 
             $width  = $image_info[0];    // width of the image
             $height = $image_info[1];    // height of the image
@@ -209,6 +230,34 @@ namespace Image{
             return $this;
         }
 
+        public function text_on_image($text = 'haven.com'){
+            $color = imagecolorallocate($this->image, 255, 0, 0);
+            imagestring($this->image, 5, 800, 600, $text, $color);
+            //saving the file with prefix
+            $this->save_image('text_');
+            return $this;
+        }
+
+        public function flip_image($direction){
+            switch ($direction){
+                case 'x':
+                    imageflip($this->image, IMG_FLIP_HORIZONTAL);
+                    $this->save_image('flipX_');
+                    break;
+                case 'y':
+                    imageflip($this->image, IMG_FLIP_VERTICAL);
+                    $this->save_image('flipY_');
+                    break;
+                case 'both':
+                    imageflip($this->image, IMG_FLIP_BOTH);
+                    $this->save_image('flipBoth_');
+                    break;
+            }
+            return $this;
+        }
+
+
+//        *******************************REWRITE END****************************************************************
 
 
         /**
@@ -236,57 +285,7 @@ namespace Image{
 
         }
 
-        /**
-         * resize the original image. these two variables provides the ratio of the width and height
-         * @param float $width_ratio
-         * @param float $height_ratio
-         */
 
-        public function resize_image__($width_ratio = 0.5, $height_ratio = 0.5){
-            if(isset($this->file)){
-                $this->data = imagecreatefromjpeg('images/'.$this->file);
-                $image_info = getimagesize('images/'.$this->file);
-
-                $width  = $image_info[0];    // width of the image
-                $height = $image_info[1];    // height of the image
-
-                //resizing the image
-                $new_width  = round ($width * $width_ratio);
-                $new_height = round ($height * $height_ratio);
-
-                //creating a new image
-                $new_image = imagecreate($new_width, $new_height);
-                imagecopyresized($new_image, $this->data, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-                imagejpeg($new_image,'manipulated_image/resized_'.$this->file, 100);
-                $this->resize_file = 'resized_'.$this->file;
-                imagedestroy($new_image);
-
-                $this->resize = true;
-            }
-        }
-
-        /**
-         * this will add text on the image and the text will be taken as string
-         * @param $text
-         */
-        public function add_text_on_image($text){
-            if(isset($this->file)) {
-                //getting the file extension
-                $file_ext = $this->get_file_extension($this->file);
-                //creating the image according to file type
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-                $bluecolor = imagecolorallocate($this->data, 0, 0, 255);
-                imagestring($this->data, 5, 500, 500, $text, $bluecolor);
-
-                //saving the file with prefix
-                $this->save_file($this->data,'texted_', $this->file, $file_ext);
-
-                $this->texted_file = 'texted_' . $this->file;
-                imagedestroy($this->data);
-                $this->texted = true;
-            }
-        }
 
         /**
          * this method will add a image on the original pic. temp pic been copied and paste on the original pic.
@@ -305,8 +304,7 @@ namespace Image{
                 // imagesx and imagesy Returns the width of the given image resource.
                 $sx = imagesx($stamp);
                 $sy = imagesy($stamp);
-//            $sx = 1600;
-//            $sy = 1600;
+
 
                 // Copy the stamp image onto our photo using the margin offsets and the photo
                 // width to calculate positioning of the stamp.
@@ -410,7 +408,7 @@ namespace Image{
          * both-> FLIP_BOTH
          * @param $direction
          */
-        public function flip_image($direction){
+        public function flip_image__($direction){
             if(isset($this->file)) {
                 $file_ext = $this->get_file_extension($this->file);
                 $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);

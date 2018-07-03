@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 include 'autoload.php';
 
 //this will create the manipulated_image folder it not exists.
@@ -64,14 +68,13 @@ if(isset($_POST['thumbnail_ratio']) && intval($_POST['thumbnail_ratio']) > 0){
 $img
 //    ->aqua()
 //    ->sharpen()
-//    ->rotate_image()
-//    ->resize_image()
+//    ->rotate_image(10)
+//    ->resize_image(.9, .9)
+    ->text_on_image()
+    ->flip_image('y')
     ->display();
 
-//$image = new Image\Instagram_Effect('images/books1.jpg');
-//$image  ->aqua()
-//        ->sepia()
-//        ->sharpen();
+
 
 ?>
 
