@@ -2,12 +2,12 @@
 namespace Image{
     class Image_Manipulation{
         public $file;
-        private  $data;
+        private $data;
 //  boolean variables
         public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected, $bestFit = false;
 
 //  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file,$watermarked2_file, $fliped_both_file, $bordered_file, $effected_file,$bestFit_file;
+        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file, $watermarked2_file, $fliped_both_file, $bordered_file, $effected_file, $bestFit_file;
 
 //  rotation degree value
         public $rotation_deg;
@@ -18,22 +18,204 @@ namespace Image{
 //    thumb ratio value
         public $thumb_ratio;
 
-        public function __construct()
+
+//        **************************Insta BEGIN*********************************************************************
+        protected $image;
+        protected $original_image;
+        protected $clone_image;
+        protected $directory;
+        protected $file_type;
+        protected $file_name;
+        protected $file_path;
+
+        public function __construct($file_path)
         {
-//        $this->file = $file;
-            //this line may redirect to the image viewer
-//        header('Content-type: image/jpeg');
+            //make a directory to store the images
+            $this->make_directory();
+            $this->file_path = $file_path;
+            $this->file_name = $this->get_file_name($file_path);
+            $this->file_type = $this->get_file_extension($file_path);
+            switch ($this->file_type){
+                case 'jpg':
+                    $this->image = imagecreatefromjpeg($file_path);
+                    break;
+                case 'png':
+                    $this->image = imagecreatefrompng($file_path);
+                    break;
+            }
+        }
+
+
+        /**
+         * creates the aqua effect on the image
+         * @return $this
+         */
+        public function aqua() {
+//            $this->clone_image_resource();
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
+            $this->save_image('insta_aqua_');
+//            imagedestroy($this->image);
+            return $this;
+        }
+
+        /**
+         * creates the sepia effect on the image
+         * @return $this
+         */
+        public function sepia() {
+//            $this->clone_image_resource();
+            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
+            $this->save_image('insta_sepia_');
+//            imagedestroy($this->image);
+            return $this;
+        }
+
+        /**
+         * creates the sharpen effect on the image
+         * @return $this
+         */
+        public function sharpen() {
+//            $this->clone_image_resource();
+            $gaussian = array(
+                array(1.0, 1.0, 1.0),
+                array(1.0, -7.0, 1.0),
+                array(1.0, 1.0, 1.0)
+            );
+            imageconvolution($this->image, $gaussian, 1, 4);
+            $this->save_image('insta_sharpen_');
+//            imagedestroy($this->image);
+            return $this;
+        }
+
+        /**
+         * this method takes the file name or file path and returns the file extension
+         * @param $file_name
+         * @return mixed
+         */
+        public function get_file_extension($file_name){
+            //checks the file extension
+            $tmp = explode('.', $file_name);
+            $file_ext = end($tmp);
+            return $file_ext;
+        }
+
+        /**
+         * this method takes the file path of the file and returns the file name
+         * @param $file_path
+         * @return mixed
+         */
+        public function get_file_name($file_path){
+            //getting the file name
+            $tmp = explode('/', $file_path);
+            $file_path = end($tmp);
+            return $file_path;
+        }
+
+        /**
+         * this method clone the image resource GD type so that we can use it as a unique resource
+         */
+        public function clone_image_resource(){
+            $width  = imagesx($this->image);
+            $height = imagesy($this->image);
+            $this->image = imagecreatetruecolor($width, $height);
+
+            imagecopy($this->clone_image, $this->image, 0, 0, 0, 0, $width, $height);
+        }
+
+        /**
+         * this method clone the image resource GD type so that we can use it as a unique resource
+         */
+        public function clone_image_src_dest($src, &$dest){
+            $width  = imagesx($src);
+            $height = imagesy($src);
+
+            $dest = imagecreate($width,$height);
+            imagecopyresized($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
+        }
+
+        /**
+         * this method creates a folder if not exists according to $folder_name variable
+         * @param string $folder_name
+         */
+        public function make_directory($folder_name = 'Insta_Effect'){
+            //this will create the manipulated_image folder it not exists.
+            if (!file_exists($folder_name)) {
+                mkdir($folder_name, 0777, true);
+            }
+        }
+
+
+        /**
+         * saves the file with prefix on the original file
+         * @param string $prefix_of_filename
+         * @return $this
+         */
+        public function save_image($prefix_of_filename = 'effected_'){
+            switch ($this->file_type){
+                case 'png':
+                    imagepng($this->image,'Insta_Effect/'.$prefix_of_filename.$this->file_name, 9);
+                    break;
+                case 'jpg':
+                    imagejpeg($this->image,'Insta_Effect/'.$prefix_of_filename.$this->file_name, 100);
+                    break;
+            }
+            return $this;
+        }
+
+        /**
+         * display the image on screen
+         */
+        public function display(){
+            // Content type
+            header('Content-type: image/jpeg');
+            imagejpeg($this->image);
+        }
+        public function display_image($image){
+            // Content type
+            header('Content-type: image/jpeg');
+            imagejpeg($image);
+        }
+//        *******************************Insta END****************************************************************
+
+        /**
+         * this method suppose to rotate the image but don't know why not working
+         * @param float $deg
+         * @return $this
+         */
+        public function rotate_image($deg = 45.0){
+            $deg = floatval($deg);
+            imagerotate($this->image, $deg, 0);
+            $this->save_image('rotate_');
+            return $this;
+        }
+
+        public function resize_image($width_ratio = 0.1, $height_ratio = 0.1){
+            $image_info = getimagesize($this->file_path);
+
+
+            $width  = $image_info[0];    // width of the image
+            $height = $image_info[1];    // height of the image
+
+            //resizing the image
+            $new_width  = round ($width * $width_ratio);
+            $new_height = round ($height * $height_ratio);
+
+            //creating a new image
+            $new_image = imagecreate($new_width, $new_height);
+            imagecopyresized($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            $this->clone_image_src_dest($new_image, $this->image);
+            $this->save_image('resize_');
+            return $this;
         }
 
 
 
-
         /**
-         * Rotate image by degree the parameter takes a int value
-         *
+         * Rotate image by degree the parameter takes a int value as rotation degree
          * @param int $deg
          */
-        public function rotate_image($deg = 45){
+        public function rotate_image__($deg = 45){
 
             if(isset($this->file)){
                 $deg = floatval($deg);
@@ -60,7 +242,7 @@ namespace Image{
          * @param float $height_ratio
          */
 
-        public function resize_image($width_ratio = 0.5, $height_ratio = 0.5){
+        public function resize_image__($width_ratio = 0.5, $height_ratio = 0.5){
             if(isset($this->file)){
                 $this->data = imagecreatefromjpeg('images/'.$this->file);
                 $image_info = getimagesize('images/'.$this->file);
@@ -595,12 +777,12 @@ namespace Image{
          * @param $file_name
          * @return mixed
          */
-        public function get_file_extension($file_name){
-            //checks the file extension
-            $tmp = explode('.', $file_name);
-            $file_ext = end($tmp);
-            return $file_ext;
-        }
+//        public function get_file_extension($file_name){
+//            //checks the file extension
+//            $tmp = explode('.', $file_name);
+//            $file_ext = end($tmp);
+//            return $file_ext;
+//        }
 
         /**
          *this method saves the image according to it's file type

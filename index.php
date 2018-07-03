@@ -6,7 +6,7 @@ if (!file_exists('manipulated_image')) {
     mkdir('manipulated_image', 0777, true);
 }
 
-$img = new Image\Image_Manipulation(); //does not require () at the end. why ?
+$img = new Image\Image_Manipulation('images/books1.jpg'); //does not require () at the end. why ?
 
 if(isset($_POST['rotate']) && intval($_POST['rotate']) >0){
     $img->rotation_deg = intval($_POST['rotate']);
@@ -40,7 +40,7 @@ if(isset($_POST['thumbnail_ratio']) && intval($_POST['thumbnail_ratio']) > 0){
 }
 
 
-$img->upload_image();
+//$img->upload_image();
 //$img->rotate_image($img->rotation_deg);
 //$img->resize_image($img->resize_width, $img->resize_height);
 //
@@ -56,15 +56,22 @@ $img->upload_image();
 //$img->flip_image('both');
 //$img->gray_scale();
 //$img->watermark_two();
-$img->add_border_to_image(5, 25, 141, 214);
+//$img->add_border_to_image(5, 25, 141, 214);
 //$img->add_effect_on_image('colorize', '',0,0,200,50);
-$img->add_effect_on_image('colorize',30,214, 24, 97);
-$img->best_fit(500, 500);
+//$img->add_effect_on_image('colorize',30,214, 24, 97);
+//$img->best_fit(500, 500);
 
-$image = new Image\Instagram_Effect('images/books1.jpg');
-$image  ->aqua()
-        ->sepia()
-        ->sharpen();
+$img
+//    ->aqua()
+//    ->sharpen()
+//    ->rotate_image()
+//    ->resize_image()
+    ->display();
+
+//$image = new Image\Instagram_Effect('images/books1.jpg');
+//$image  ->aqua()
+//        ->sepia()
+//        ->sharpen();
 
 ?>
 
