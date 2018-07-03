@@ -73,6 +73,7 @@ $img
 //    ->text_on_image()
 //    ->flip_image('both')
 //    ->border_on_image(5, 25, 141, 214)
+//    ->GD_effect('colorize')
     ->display();
 
 

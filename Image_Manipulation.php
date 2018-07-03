@@ -293,6 +293,77 @@ namespace Image{
             return $image;
         }
 
+        /**
+         * this method will create effect on the image. Various type of effect can be imposed on the image
+         * according to the case selection. The case name refers the effect that going to apply on the image.
+         * to be continued.
+         * @param $effect
+         * @param int $level
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @param int $opacity
+         * @return $this
+         */
+
+        public function GD_effect($effect = 'negative', $level = 100, $red = 124, $green = 34, $blue = 200, $opacity =10){
+            switch ($effect){
+                case 'blur':
+                    for ($i = 0; $i < 10; $i++){
+                        imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
+                    }
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'selective_blur':
+                    for ($i = 0; $i < 10; $i++) {
+                        imagefilter($this->image, IMG_FILTER_SELECTIVE_BLUR);
+                    }
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'negative':
+                    imagefilter($this->image, IMG_FILTER_NEGATE);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'gray':
+                    imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'edge_detection':
+                    imagefilter($this->image, IMG_FILTER_EDGEDETECT);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'emboss':
+                    imagefilter($this->image, IMG_FILTER_EMBOSS);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'sketchy':
+                    imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'brightness':
+                    imagefilter($this->image, IMG_FILTER_BRIGHTNESS, $level);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'contrast':
+                    imagefilter($this->image, IMG_FILTER_CONTRAST, $level);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'smooth':
+                    imagefilter($this->image, IMG_FILTER_SMOOTH, $level);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'pixels':
+                    imagefilter($this->image, IMG_FILTER_PIXELATE, $level,true);
+                    $this->save_image('GD_effect_');
+                    break;
+                case 'colorize':
+                    imagefilter($this->image, IMG_FILTER_COLORIZE, $red, $green, $blue, $opacity);
+                    $this->save_image('GD_effect_');
+                    break;
+            }
+            return $this;
+        }
+
 
 
 //        *******************************REWRITE END****************************************************************
@@ -608,118 +679,6 @@ namespace Image{
             }
         }
 
-
-
-        /**
-         *this method will create effect on the image. Various type of effect can be imposed on the image
-         * according to the case selection. The case name refers the effect that going to apply on the image.
-         * @param $effect
-         * @param int $level
-         * @param int $red
-         * @param int $green
-         * @param int $blue
-         * @param int $opacity
-         */
-
-        function add_effect_on_image($effect, $level = 100, $red = 124, $green = 34, $blue = 200, $opacity =10){
-            if(isset($this->file)) {
-                //getting the file extension of the image
-                $file_ext = $this->get_file_extension($this->file);
-                //creating the image instances
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-
-                switch ($effect){
-                    case 'blur':
-                        for ($i = 0; $i < 10; $i++){
-                        imagefilter($this->data, IMG_FILTER_GAUSSIAN_BLUR);
-                    }
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'selective_blur':
-                        for ($i = 0; $i < 10; $i++) {
-                            imagefilter($this->data, IMG_FILTER_SELECTIVE_BLUR);
-                        }
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'negative':
-                        imagefilter($this->data, IMG_FILTER_NEGATE);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'gray':
-                        imagefilter($this->data, IMG_FILTER_GRAYSCALE);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'edge_detection':
-                        imagefilter($this->data, IMG_FILTER_EDGEDETECT);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'emboss':
-                        imagefilter($this->data, IMG_FILTER_EMBOSS);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'sketchy':
-                        imagefilter($this->data, IMG_FILTER_MEAN_REMOVAL);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'brightness':
-                        imagefilter($this->data, IMG_FILTER_BRIGHTNESS, $level);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'contrast':
-                        imagefilter($this->data, IMG_FILTER_CONTRAST, $level);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'smooth':
-                        imagefilter($this->data, IMG_FILTER_SMOOTH, $level);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'pixels':
-                        imagefilter($this->data, IMG_FILTER_PIXELATE, $level,true);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                    case 'colorize':
-                        imagefilter($this->data, IMG_FILTER_COLORIZE, $red, $green, $blue, $opacity);
-                        $this->save_file($this->data,'effect_', $this->file, $file_ext);
-                        $this->effected_file = 'effect_'.$this->file;
-                        imagedestroy($this->data);
-                        $this->effected = true;
-                        break;
-                }
-            }
-        }
 
         /**
          * this method will change the image to best fit, according to it's orientation.
