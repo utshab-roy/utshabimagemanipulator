@@ -240,6 +240,14 @@ namespace Image{
             return $this;
         }
 
+        /**
+         * this method will flip the image according to the direction
+         * x-> HORIZONTAL
+         * y-> VERTICAL
+         * both-> FLIP_BOTH
+         * @param $direction
+         * @return $this
+         */
         public function flip_image($direction){
             switch ($direction){
                 case 'x':
