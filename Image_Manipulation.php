@@ -133,6 +133,7 @@ namespace Image{
             $dest = imagecreate($width,$height);
 //            imagecopyresized($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
             imagecopy($dest, $src, 0, 0, 0, 0, $width, $height);
+//            imagecopyresampled($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
 
         }
 
@@ -195,7 +196,6 @@ namespace Image{
             }
         }
 
-
         /**
          * this method suppose to rotate the image but don't know why not working
          * @param float $deg
@@ -205,6 +205,32 @@ namespace Image{
 //            $deg = floatval($deg);
             imagerotate($this->image, $deg, 0);
             $this->save_image('rotate_');
+            return $this;
+        }
+
+        /**
+         * this method crop the image according to the given value.
+         *
+         * @param int $position_x           starting posing of x-axis
+         * @param int $position_y           starting posing of y-axis
+         * @param int $width                width of the cropped image size
+         * @param int $height               height of the cropped image size
+         * @return $this                    returns the object
+         */
+        public function crop($position_x = 200, $position_y = 200, $width = 500, $height = 400){
+            $size = min(imagesx($this->image), imagesy($this->image));
+            $flag = false;
+            if ($size > $width && $size > $height){
+                $cropped_image = imagecrop($this->image, ['x' => $position_x, 'y' => $position_y, 'width' => $width, 'height' => $height]);
+                $flag = true;
+            }
+//            $this->display_image($cropped_image);
+            if ($flag) {
+                $this->clone_image_src_dest($cropped_image, $this->image);
+                $this->save_image('cropped_');
+            }else{
+                $this->save_image('not_cropped_');
+            }
             return $this;
         }
 
@@ -232,8 +258,78 @@ namespace Image{
             return $this;
         }
 
-        public function text_on_image($text = 'haven.com'){
-            $color = imagecolorallocate($this->image, 255, 0, 0);
+        /**
+         * this method resize the image and returns the image file resource
+         * @param $width_ratio
+         * @param $height_ratio
+         * @param $file_path
+         * @return resource
+         */
+        public function get_resize_image($width_ratio, $height_ratio, $file_path){
+
+            $this->file_path = $file_path;
+            $this->file_name = $this->get_file_name($file_path);
+            $this->file_type = $this->get_file_extension($file_path);
+            switch ($this->file_type){
+                case 'jpg':
+                    $img = imagecreatefromjpeg($file_path);
+                    break;
+                case 'png':
+                    $img = imagecreatefrompng($file_path);
+                    break;
+            }
+
+            $image_info = getimagesize($file_path);
+            $width  = $image_info[0];    // width of the image
+            $height = $image_info[1];    // height of the image
+
+            //resizing the image
+            $new_width  = round ($width * $width_ratio);
+            $new_height = round ($height * $height_ratio);
+
+            //creating a new image
+            $new_image = imagecreate($new_width, $new_height);
+            imagecopyresized($new_image, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+            return $new_image;
+        }
+
+        /**
+         * this method resize the image with the given pixel value
+         * @param int $width_pixels
+         * @param int $height_pixels
+         * @return $this
+         */
+        public function resize_image_pixels($width_pixels = 400, $height_pixels = 250){
+            $image_info = getimagesize($this->file_path);
+
+            $width  = $image_info[0];    // width of the image
+            $height = $image_info[1];    // height of the image
+
+            //resizing the image
+            $new_width  = intval($width_pixels);
+            $new_height = intval($height_pixels);
+
+            //creating a new image
+            $new_image = imagecreate($new_width, $new_height);
+            imagecopyresized($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            $this->clone_image_src_dest($new_image, $this->image);
+            $this->save_image('resizePixels_');
+            return $this;
+        }
+
+        /**
+         * this method add text on the image and the text input is as string
+         * you can select the color of the text using RGB value
+         * @param string $text
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @return $this
+         */
+
+        public function text_on_image($text = 'haven.com', $red = 255, $green = 0, $blue = 0){
+            $color = imagecolorallocate($this->image, $red, $green, $blue);
             imagestring($this->image, 5, 800, 600, $text, $color);
             //saving the file with prefix
             $this->save_image('text_');
@@ -266,19 +362,19 @@ namespace Image{
             return $this;
         }
 
-        public function border_on_image($border_pixel = 10, $red = 255, $green = 0, $blue = 0){
+        public function border_on_image($thickness = 10, $red = 255, $green = 0, $blue = 0){
             //width and height of the image
             $width = imagesx($this->image);
             $height = imagesy($this->image);
 
-            $dest = imagecreatetruecolor($width + $border_pixel * 2, $height + $border_pixel * 2);
+            $dest = imagecreatetruecolor($width + $thickness * 2, $height + $thickness * 2);
 
             $dest = $this->get_border_color($dest, $red, $green, $blue);
 
 //            $this->display_image($dest);
 
             // Copy
-            imagecopy($dest, $this->image, $border_pixel, $border_pixel, 0, 0, $width, $height);
+            imagecopy($dest, $this->image, $thickness, $thickness, 0, 0, $width, $height);
 //            $this->display_image($dest); //its displaying the perfect image, after cloning the pic reduce quality
             $this->clone_image_src_dest($dest, $this->image);
             //saving the file with prefix
@@ -401,7 +497,96 @@ namespace Image{
             return $this;
         }
 
+        /**
+         * this method watermark the original image with the given image, first it resize the given
+         * image then it create the watermark of the image
+         * @param $image_path
+         * @return $this
+         */
+        public function watermark_with_image($image_path, $opacity = 40){
+            // Load the stamp and the photo to apply the watermark to
+            $stamp = $this->get_resize_image(.2, .2,$image_path);
 
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $marge_right = 10;
+            $marge_bottom = 10;
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+
+            // Copy the stamp image onto our photo using the margin offsets and the photo
+            // width to calculate positioning of the stamp.
+//            imagecopy($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+            imagecopymerge($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp), $opacity);
+
+            $this->save_image('watermak_with_image_');
+            return $this;
+        }
+
+        /**
+         * this method stamped the original image with the given image. The given image has to be
+         * properly sized. The $marge_right & $marge_bottom will position the stamp on the image
+         * @param $file_path
+         * @param int $marge_right
+         * @param int $marge_bottom
+         * @return $this
+         */
+        public function stamp_on_image($file_path, $marge_right = 40,$marge_bottom = 20){
+            // Load the stamp and the photo to apply the watermark to
+            $file_type = $this->get_file_extension($file_path);
+            switch ($file_type){
+                case 'jpg':
+                    $stamp = imagecreatefromjpeg($file_path);
+                    break;
+                case 'png':
+                    $stamp = imagecreatefrompng($file_path);
+                    break;
+            }
+
+            // Set the margins for the stamp and get the height/width of the stamp image
+            $sx = imagesx($stamp);
+            $sy = imagesy($stamp);
+
+            // Copy the stamp image onto our photo using the margin offsets and the photo
+            // width to calculate positioning of the stamp.
+            imagecopy($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+
+            $this->save_image('stamp_on_image_');
+            return $this;
+        }
+
+        /**
+         * this method creates the thumbnail of the original pic according to the thumb ratio
+         * @param $thumb_ratio
+         * @return $this
+         */
+        public function thumbnail($thumb_ratio){
+            $width = imagesx($this->image);
+            $height = imagesy($this->image);
+
+            //get the min value of the between height and width
+            $min_value = min($width, $height);
+
+            $thumb_width = intval($min_value / $thumb_ratio);
+            $thumb_height = intval($min_value / $thumb_ratio);
+
+            $thumbnail = imagecreatetruecolor($thumb_width, $thumb_height);
+
+            imagecopyresampled($thumbnail, $this->image, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+//            $this->display_image($thumbnail);
+            $this->clone_image_src_dest($thumbnail, $this->image);
+            $this->save_image('thumb_');
+
+            return $this;
+        }
+
+        /**
+         * simply returns the Aspect ratio of the image
+         * @param $image
+         * @return float|int
+         */
+        public function getAspectRatio($image){
+            return imagesx($image) / imagesy($image);
+        }
 
 //        *******************************REWRITE END****************************************************************
 
@@ -430,267 +615,13 @@ namespace Image{
             }
 
         }
-
-
-
-        /**
-         * this method will add a image on the original pic. temp pic been copied and paste on the original pic.
-         * here right and bottom variable just positioning the stamp
-         */
-
-        public function add_stamp_on_image(){
-            if(isset($this->file)) {
-                $stamp = imagecreatefrompng('images/copyright.png');
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-
-                // Set the margins for the stamp and get the height/width of the stamp image
-                $right = 100;
-                $bottom = 400;
-
-                // imagesx and imagesy Returns the width of the given image resource.
-                $sx = imagesx($stamp);
-                $sy = imagesy($stamp);
-
-
-                // Copy the stamp image onto our photo using the margin offsets and the photo
-                // width to calculate positioning of the stamp.
-                imagecopy($this->data, $stamp, imagesx($this->data) - $sx - $right, imagesy($this->data) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp));
-
-                imagejpeg($this->data, 'manipulated_image/stamped_' . $this->file, 100);
-                $this->stamped_file = 'stamped_' . $this->file;
-                imagedestroy($this->data);
-
-                $this->stamped = true;
-            }
-        }
-
-
-
-        /**
-         * creates the thumbnail of the image and the ratio to shorter the pic
-         * @param $thumb_ratio
-         */
-        public function create_thumbnail($thumb_ratio){
-            if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-
-                $width = imagesx($this->data);
-                $height = imagesy($this->data);
-
-                $thumb_width = intval($width / $thumb_ratio);
-                $thumb_height = intval($height / $thumb_ratio);
-
-                $thumbnail = imagecreatetruecolor($thumb_width, $thumb_height);
-
-                imagecopyresampled($thumbnail, $this->data, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
-
-                imagejpeg($thumbnail, 'manipulated_image/thumbnail_' . $this->file, 100);
-                $this->thumbnail_file = 'thumbnail_' . $this->file;
-                imagedestroy($thumbnail);
-                imagedestroy($this->data);
-                $this->thumbnailed = true;
-            }
-        }
-
-        /**
-         * this method crop the image, the max limit is the min size between the height & width
-         * right now it will crop like a square of the min size of height or width
-         */
-
-        public function crop_image(){
-            if(isset($this->file)) {
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-                $size = min(imagesx($this->data), imagesy($this->data));
-
-
-                $im2 = imagecrop($this->data, ['x' => 0, 'y' => 0, 'width' => ($size), 'height' => ($size)]);
-                if ($im2 !== FALSE) {
-                    imagejpeg($im2, 'manipulated_image/croped_' . $this->file, 100);
-                    $this->croped_file = 'croped_' . $this->file;
-                    imagedestroy($im2);
-                }
-                imagedestroy($this->data);
-                $this->croped = true;
-            }
-        }
-
-        /**
-         * this method will flip the image according to the direction
-         * x-> HORIZONTAL
-         * y-> VERTICAL
-         * both-> FLIP_BOTH
-         * @param $direction
-         */
-        public function flip_image__($direction){
-            if(isset($this->file)) {
-                $file_ext = $this->get_file_extension($this->file);
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-                switch ($direction){
-                    case 'x':
-                        imageflip($this->data, IMG_FLIP_HORIZONTAL);
-                        $this->save_file($this->data,'fliped_horizontal_',$this->file,$file_ext);
-                        $this->fliped_horizontally_file = 'fliped_horizontal_' . $this->file;
-                        imagedestroy($this->data);
-                        $this->flip_horizontally = true;
-                        break;
-                    case 'y':
-                        imageflip($this->data, IMG_FLIP_VERTICAL);
-                        $this->save_file($this->data,'fliped_vertical_',$this->file,$file_ext);
-                        $this->fliped_vertically_file = 'fliped_vertical_' . $this->file;
-                        imagedestroy($this->data);
-                        $this->flip_vertically = true;
-                        break;
-                    case 'both':
-                        imageflip($this->data, IMG_FLIP_BOTH);
-                        $this->save_file($this->data,'fliped_both_',$this->file,$file_ext);
-                        $this->fliped_both_file = 'fliped_both_' . $this->file;
-                        imagedestroy($this->data);
-                        $this->flip_both = true;
-                        break;
-                }
-            }
-        }
-
-        /**
-         * this method convert the original picture to gray scale
-         */
-        public function gray_scale(){
-            if(isset($this->file)) {
-                //getting the file extension of the image
-                $file_ext = $this->get_file_extension($this->file);
-
-                //creating the image
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-
-                $width = imagesx($this->data);
-                $height = imagesy($this->data);
-
-                for ($i=0; $i<$width; $i++)
-                {
-                    for ($j=0; $j<$height; $j++)
-                    {
-                        // get the rgb value for current pixel
-                        $rgb = ImageColorAt($this->data, $i, $j);
-                        // extract each value for r, g, b
-                        $rr = ($rgb >> 16) & 0xFF;
-                        $gg = ($rgb >> 8) & 0xFF;
-                        $bb = $rgb & 0xFF;
-                        // get the Value from the RGB value
-                        $g = round(($rr + $gg + $bb) / 3);
-                        // grayscale values have r=g=b=g
-                        $val = imagecolorallocate($this->data, $g, $g, $g);
-                        // set the gray value
-                        imagesetpixel ($this->data, $i, $j, $val);
-                    }
-                }
-
-                $this->save_file($this->data,'gray_',$this->file,$file_ext);
-                $this->gray_pic_file = 'gray_' . $this->file;
-                imagedestroy($this->data);
-                $this->grayed = true;
-            }
-        }
-
-        public function watermark_two(){
-            if(isset($this->file)) {
-                // Load the stamp and the photo to apply the watermark to
-                $stamp = $this->resize_img(.2, .2,'books2.jpg');
-                $this->data = imagecreatefromjpeg('images/' . $this->file);
-
-                // Set the margins for the stamp and get the height/width of the stamp image
-                $marge_right = 10;
-                $marge_bottom = 10;
-                $sx = imagesx($stamp);
-                $sy = imagesy($stamp);
-
-                // Copy the stamp image onto our photo using the margin offsets and the photo
-                // width to calculate positioning of the stamp.
-                imagecopy($this->data, $stamp, imagesx($this->data) - $sx - $marge_right, imagesy($this->data) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
-
-                // Output and free memory
-                imagejpeg($this->data, 'manipulated_image/watermark2_' . $this->file, 100);
-                $this->watermarked2_file = 'watermark2_' . $this->file;
-                imagedestroy($this->data);
-                $this->watermarked2 = true;
-            }
-        }
-
-        /**
-         * this method resize the image and returns the image file resource
-         * @param $width_ratio
-         * @param $height_ratio
-         * @param $img_filename
-         * @return resource
-         */
-        public function resize_img($width_ratio, $height_ratio, $img_filename){
-
-            $file_ext = $this->get_file_extension($img_filename);
-
-            $img = $this->image_create_according_to_file_extension($img_filename,$file_ext);
-
-            $image_info = getimagesize('images/'.$img_filename);
-
-            $width  = $image_info[0];    // width of the image
-            $height = $image_info[1];    // height of the image
-
-            //resizing the image
-            $new_width  = round ($width * $width_ratio);
-            $new_height = round ($height * $height_ratio);
-
-            //creating a new image
-            $new_image = imagecreate($new_width, $new_height);
-            imagecopyresized($new_image, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-            $this->save_file($new_image, 'resized_img_',$img_filename,$file_ext);
-
-            return $new_image;
-        }
-
-        /**
-         * add a border to the original image, the border size has to given as pixel
-         * and the color of the border will be according to RGB color, default border color is black
-         * @param $border_pixel
-         * @param $red
-         * @param $green
-         * @param $blue
-         */
-
-        public function add_border_to_image($border_pixel = 10, $red = 0, $green = 0, $blue = 0){
-            if(isset($this->file)) {
-                //getting the file extension of the image
-                $file_ext = $this->get_file_extension($this->file);
-                //creating the image instances
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-
-                $sx = imagesx($this->data);
-                $sy = imagesy($this->data);
-
-                $dest = imagecreatetruecolor($sx + $border_pixel * 2, $sy + $border_pixel * 2);
-
-                $dest = $this->get_border_color($dest, $red, $green, $blue);
-
-                // Copy
-                imagecopy($dest, $this->data, $border_pixel, $border_pixel, 0, 0, $sx, $sy);
-
-                //saving the file with prefix
-                $this->save_file($dest,'border_',$this->file,$file_ext);
-                $this->bordered_file = 'border_'.$this->file;
-
-                // Output and free from memory
-                imagedestroy($dest);
-                imagedestroy($this->data);
-                $this->bordered = true;
-            }
-        }
-
-
+        
         /**
          * this method will change the image to best fit, according to it's orientation.
          * it has some bug. Need tobe fixed. I believe the bug is on the  imagecopyresampled method
          * @param int $maxWidth
          * @param int $maxHeight
          */
-
         public function best_fit($maxWidth = 300, $maxHeight = 300){
             if(isset($this->file)) {
                 //getting the file extension of the image
@@ -751,62 +682,6 @@ namespace Image{
                     $this->bestFit = true;
                 }
             }
-        }
-
-        public function getAspectRatio($image){
-            return imagesx($image) / imagesy($image);
-        }
-
-
-        /**
-         * this function returns the file extension of the file
-         * @param $file_name
-         * @return mixed
-         */
-//        public function get_file_extension($file_name){
-//            //checks the file extension
-//            $tmp = explode('.', $file_name);
-//            $file_ext = end($tmp);
-//            return $file_ext;
-//        }
-
-        /**
-         *this method saves the image according to it's file type
-         * have to provide the image file, prefix text that is going to add before the image file name
-         * the original file name that will be the last part of the manipulated image
-         * and last the file extension for the type of the image
-         * @param $new_image
-         * @param $prefix_of_filename
-         * @param $original_filename
-         * @param $file_ext
-         */
-        public function save_file($new_image, $prefix_of_filename, $original_filename, $file_ext){
-            switch ($file_ext){
-                case 'png':
-                    imagepng($new_image,'manipulated_image/'.$prefix_of_filename.$original_filename, 9);
-                    break;
-                case 'jpg':
-                    imagejpeg($new_image,'manipulated_image/'.$prefix_of_filename.$original_filename, 100);
-                    break;
-            }
-        }
-
-        /**
-         * @param $img_filename
-         * @param $file_ext
-         * @return resource
-         */
-        public function image_create_according_to_file_extension($img_filename,$file_ext){
-
-            switch ($file_ext){
-                case 'png':
-                    $img = imagecreatefrompng('images/' . $img_filename);
-                    break;
-                case 'jpg':
-                    $img = imagecreatefromjpeg('images/' . $img_filename);
-                    break;
-            }
-            return $img;
         }
 
 

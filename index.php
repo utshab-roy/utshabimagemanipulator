@@ -75,6 +75,11 @@ $img
 //    ->border_on_image(5, 25, 141, 214)
 //    ->GD_effect('colorize')
 //    ->watermark_image(70, 30, 30)
+//    ->thumbnail(5)
+//    ->watermark_with_image('images/books2.jpg')
+//    ->stamp_on_image('images/copyright.png', 40, 20)
+//    ->crop(200,200,200,400)
+//    ->resize_image_pixels(600, 200)
     ->display();
 
 
