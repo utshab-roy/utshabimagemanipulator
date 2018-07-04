@@ -1,22 +1,6 @@
 <?php
 namespace Image{
     class Image_Manipulation{
-        public $file;
-//  boolean variables
-        public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected, $bestFit = false;
-
-//  variables to store the name of the files
-        public $rotated_file, $resize_file, $texted_file, $stamped_file, $watermarked_file, $thumbnail_file, $croped_file, $fliped_vertically_file, $fliped_horizontally_file, $gray_pic_file, $watermarked2_file, $fliped_both_file, $bordered_file, $effected_file, $bestFit_file;
-
-//  rotation degree value
-        public $rotation_deg;
-//    resize values for resizing the pic height and width
-        public $resize_width, $resize_height;
-//    text on the pic
-        public $text_on_pic;
-//    thumb ratio value
-        public $thumb_ratio;
-
 
         protected $image;
         protected $original_image;
@@ -50,7 +34,7 @@ namespace Image{
         public function insta_aqua() {
 //            $this->clone_image_resource();
             imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
-            $this->save_image('insta_aqua_');
+//            $this->save_image('insta_aqua_');
             return $this;
         }
 
@@ -62,7 +46,7 @@ namespace Image{
 //            $this->clone_image_resource();
             imagefilter($this->image, IMG_FILTER_GRAYSCALE);
             imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
-            $this->save_image('insta_sepia_');
+//            $this->save_image('insta_sepia_');
             return $this;
         }
 
@@ -195,14 +179,24 @@ namespace Image{
          * @return $this
          */
         public function insta_sharpen() {
-//            $this->clone_image_resource();
+
             $gaussian = array(
                 array(1.0, 1.0, 1.0),
                 array(1.0, -7.0, 1.0),
                 array(1.0, 1.0, 1.0)
             );
             imageconvolution($this->image, $gaussian, 1, 4);
-            $this->save_image('insta_sharpen_');
+//            $this->save_image('insta_sharpen_');
+            return $this;
+        }
+
+        /**
+         * creates a radium effect on the image
+         * @return $this
+         */
+        public function radium(){
+            // change gamma value of the pic
+            imagegammacorrect($this->image, 1.0, .1);
             return $this;
         }
 
@@ -302,6 +296,11 @@ namespace Image{
                     break;
             }
         }
+
+        /**
+         * takes the GD type image resource and display the image on the screen
+         * @param $image
+         */
         public function display_image($image){
             // Content type
             switch ($this->file_type){
@@ -326,7 +325,7 @@ namespace Image{
             $rotated_photo = imagerotate ($this->image , $deg , 0 );
             imagejpeg($rotated_photo, 'Insta_Effect/rotate.jpg');
             $this->clone_image_src_dest($rotated_photo, $this->image);
-            $this->save_image('__rotate');
+//            $this->save_image('__rotate');
             return $this;
         }
 
@@ -349,10 +348,11 @@ namespace Image{
 //            $this->display_image($cropped_image);
             if ($flag) {
                 $this->clone_image_src_dest($cropped_image, $this->image);
-                $this->save_image('cropped_');
-            }else{
-                $this->save_image('not_cropped_');
+//                $this->save_image('cropped_');
             }
+//            else{
+//                $this->save_image('not_cropped_');
+//            }
             return $this;
         }
 
@@ -376,7 +376,7 @@ namespace Image{
             $new_image = imagecreate($new_width, $new_height);
             imagecopyresized($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             $this->clone_image_src_dest($new_image, $this->image);
-            $this->save_image('resize_');
+//            $this->save_image('resize_');
             return $this;
         }
 
@@ -436,7 +436,7 @@ namespace Image{
             $new_image = imagecreate($new_width, $new_height);
             imagecopyresized($new_image, $this->image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             $this->clone_image_src_dest($new_image, $this->image);
-            $this->save_image('resizePixels_');
+//            $this->save_image('resizePixels_');
             return $this;
         }
 
@@ -449,12 +449,11 @@ namespace Image{
          * @param int $blue
          * @return $this
          */
-
         public function text_on_image($text = 'haven.com', $red = 255, $green = 0, $blue = 0){
             $color = imagecolorallocate($this->image, $red, $green, $blue);
             imagestring($this->image, 5, 800, 600, $text, $color);
             //saving the file with prefix
-            $this->save_image('text_');
+//            $this->save_image('text_');
             return $this;
         }
 
@@ -470,15 +469,15 @@ namespace Image{
             switch ($direction){
                 case 'x':
                     imageflip($this->image, IMG_FLIP_HORIZONTAL);
-                    $this->save_image('flipX_');
+//                    $this->save_image('flipX_');
                     break;
                 case 'y':
                     imageflip($this->image, IMG_FLIP_VERTICAL);
-                    $this->save_image('flipY_');
+//                    $this->save_image('flipY_');
                     break;
                 case 'both':
                     imageflip($this->image, IMG_FLIP_BOTH);
-                    $this->save_image('flipBoth_');
+//                    $this->save_image('flipBoth_');
                     break;
             }
             return $this;
@@ -508,7 +507,7 @@ namespace Image{
 //            $this->display_image($dest); //its displaying the perfect image, after cloning the pic reduce quality
             $this->clone_image_src_dest($dest, $this->image);
             //saving the file with prefix
-            $this->save_image('border_');
+//            $this->save_image('border_');
             return $this;
         }
 
@@ -539,60 +538,59 @@ namespace Image{
          * @param int $opacity
          * @return $this
          */
-
         public function GD_effect($effect = 'negative', $level = 100, $red = 124, $green = 34, $blue = 200, $opacity =10){
             switch ($effect){
                 case 'blur':
                     for ($i = 0; $i < 10; $i++){
                         imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
                     }
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'selective_blur':
                     for ($i = 0; $i < 10; $i++) {
                         imagefilter($this->image, IMG_FILTER_SELECTIVE_BLUR);
                     }
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'negative':
                     imagefilter($this->image, IMG_FILTER_NEGATE);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'gray':
                     imagefilter($this->image, IMG_FILTER_GRAYSCALE);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'edge_detection':
                     imagefilter($this->image, IMG_FILTER_EDGEDETECT);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'emboss':
                     imagefilter($this->image, IMG_FILTER_EMBOSS);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'sketchy':
                     imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'brightness':
                     imagefilter($this->image, IMG_FILTER_BRIGHTNESS, $level);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'contrast':
                     imagefilter($this->image, IMG_FILTER_CONTRAST, $level);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'smooth':
                     imagefilter($this->image, IMG_FILTER_SMOOTH, $level);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'pixels':
                     imagefilter($this->image, IMG_FILTER_PIXELATE, $level,true);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
                 case 'colorize':
                     imagefilter($this->image, IMG_FILTER_COLORIZE, $red, $green, $blue, $opacity);
-                    $this->save_image('GD_effect_');
+//                    $this->save_image('GD_effect_');
                     break;
             }
             return $this;
@@ -623,7 +621,7 @@ namespace Image{
             // Merge the stamp onto our photo with an opacity of 50%
             imagecopymerge($this->image, $stamp, imagesx($this->image) - $sx - $right, imagesy($this->image) - $sy - $bottom, 0, 0, imagesx($stamp), imagesy($stamp), $opacity);
 
-            $this->save_image('waterMark_');
+//            $this->save_image('waterMark_');
             return $this;
         }
 
@@ -649,7 +647,7 @@ namespace Image{
 //            imagecopy($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
             imagecopymerge($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp), $opacity);
 
-            $this->save_image('watermak_with_image_');
+//            $this->save_image('watermak_with_image_');
             return $this;
         }
 
@@ -681,7 +679,7 @@ namespace Image{
             // width to calculate positioning of the stamp.
             imagecopy($this->image, $stamp, imagesx($this->image) - $sx - $marge_right, imagesy($this->image) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
 
-            $this->save_image('stamp_on_image_');
+//            $this->save_image('stamp_on_image_');
             return $this;
         }
 
@@ -705,7 +703,7 @@ namespace Image{
             imagecopyresampled($thumbnail, $this->image, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
 //            $this->display_image($thumbnail);
             $this->clone_image_src_dest($thumbnail, $this->image);
-            $this->save_image('thumb_');
+//            $this->save_image('thumb_');
 
             return $this;
         }
