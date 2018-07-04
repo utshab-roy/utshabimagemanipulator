@@ -1,4 +1,16 @@
 <?php
+/**
+ * @category   PhotoEditor
+ * @package    Image
+ * @author     Utshab Roy<utshab.roy@gmail.com>
+ * @copyright  2018 Utshab Roy
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: @package_version@ 1.0.0
+ * @link       https://github.com/utshab-roy/photoEditor_php
+ * @see        NetOther, Net_Sample::Net_Sample()
+ * @since      Class available since Release 1.0.0
+ */
+
 namespace Image{
     class Image_Manipulation{
 
@@ -12,8 +24,6 @@ namespace Image{
 
         public function __construct($file_path)
         {
-            //make a directory to store the images
-            $this->make_directory();
             $this->file_path = $file_path;
             $this->file_name = $this->get_file_name($file_path);
             $this->file_type = $this->get_file_extension($file_path);
@@ -27,178 +37,6 @@ namespace Image{
             }
         }
 
-        /**
-         * creates the aqua effect on the image
-         * @return $this
-         */
-        public function insta_aqua() {
-//            $this->clone_image_resource();
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
-//            $this->save_image('insta_aqua_');
-            return $this;
-        }
-
-        /**
-         * creates the sepia effect on the image
-         * @return $this
-         */
-        public function insta_sepia() {
-//            $this->clone_image_resource();
-            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
-//            $this->save_image('insta_sepia_');
-            return $this;
-        }
-
-        /**
-         * creates the cool effect on the image
-         * @return $this
-         */
-        public function insta_cool() {
-            imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
-            imagefilter($this->image, IMG_FILTER_CONTRAST, -50);
-            return $this;
-        }
-
-        /**
-         * creates the light effect on the image
-         * @return $this
-         */
-        public function insta_light() {
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0, 10);
-            return $this;
-        }
-
-        /**
-         * creates the fuzzy effect on the image
-         * @return $this
-         */
-        public function insta_fuzzy() {
-            $gaussian = array(
-                array(1.0, 1.0, 1.0),
-                array(1.0, 1.0, 1.0),
-                array(1.0, 1.0, 1.0)
-            );
-            imageconvolution($this->image, $gaussian, 9, 20);
-            return $this;
-        }
-
-        /**
-         * creates the boost effect on the image
-         * @return $this
-         */
-        public function insta_boost() {
-            imagefilter($this->image, IMG_FILTER_CONTRAST, -35);
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
-            return $this;
-        }
-
-        /**
-         * creates the antique effect on the image
-         * @return $this
-         */
-        public function insta_antique() {
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 0);
-            imagefilter($this->image, IMG_FILTER_CONTRAST, -30);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 75, 50, 25);
-            return $this;
-        }
-
-        /**
-         * creates the vintage effect on the image
-         * @return $this
-         */
-        public function insta_vintage() {
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
-            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 40, 10, -15);
-            return $this;
-        }
-
-        /**
-         * creates the everglow effect on the image
-         * @return $this
-         */
-        public function insta_everglow() {
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -30);
-            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 30, 30, 0);
-            return $this;
-        }
-
-        /**
-         * creates the freshblue effect on the image
-         * @return $this
-         */
-        public function insta_freshblue() {
-            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 20, 0, 80, 60);
-            return $this;
-        }
-
-        /**
-         * creates the tender effect on the image
-         * @return $this
-         */
-        public function insta_tender() {
-            imagefilter($this->image, IMG_FILTER_CONTRAST, 5);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 80, 20, 40, 50);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 40, 40, 100);
-            imagefilter($this->image, IMG_FILTER_SELECTIVE_BLUR);
-            return $this;
-        }
-
-        /**
-         * creates the dream effect on the image
-         * @return $this
-         */
-        public function insta_dream() {
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 150, 0, 0, 50);
-            imagefilter($this->image, IMG_FILTER_NEGATE);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 50, 0, 50);
-            imagefilter($this->image, IMG_FILTER_NEGATE);
-            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
-            return $this;
-        }
-
-        /**
-         * creates the frozen effect on the image
-         * @return $this
-         */
-        public function insta_frozen() {
-            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -15);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
-            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
-            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
-            return $this;
-        }
-
-        /**
-         * creates the sharpen effect on the image
-         * @return $this
-         */
-        public function insta_sharpen() {
-
-            $gaussian = array(
-                array(1.0, 1.0, 1.0),
-                array(1.0, -7.0, 1.0),
-                array(1.0, 1.0, 1.0)
-            );
-            imageconvolution($this->image, $gaussian, 1, 4);
-//            $this->save_image('insta_sharpen_');
-            return $this;
-        }
-
-        /**
-         * creates a radium effect on the image
-         * @return $this
-         */
-        public function radium(){
-            // change gamma value of the pic
-            imagegammacorrect($this->image, 1.0, .1);
-            return $this;
-        }
 
         /**
          * this method takes the file name or file path and returns the file extension
@@ -241,13 +79,18 @@ namespace Image{
          * @param $src
          * @param $dest
          */
-        public function clone_image_src_dest($src, &$dest){
+        public function clone_image_src_dest(&$src, &$dest){
             $width  = imagesx($src);
             $height = imagesy($src);
 
-            $dest = imagecreate($width,$height);
+            $dest_width  = imagesx($dest);
+            $dest_height = imagesy($dest);
+
+//            $dest = imagecreate($width,$height);
+            $dest = imagerotate($src, 360, 1);
+//            $this->display_image($dest);
 //            imagecopyresized($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
-            imagecopy($dest, $src, 0, 0, 0, 0, $width, $height);
+//            imagecopy($dest, $src, 0, 0, 0, 0, $width, $height);
 //            imagecopyresampled($dest, $src, 0, 0, 0, 0, $width, $height, $width, $height);
 
         }
@@ -256,7 +99,7 @@ namespace Image{
          * this method creates a folder if not exists according to $folder_name variable
          * @param string $folder_name
          */
-        public function make_directory($folder_name = 'Insta_Effect'){
+        public function make_directory($folder_name = 'Manipulated_Images'){
             //this will create the manipulated_image folder it not exists.
             if (!file_exists($folder_name)) {
                 mkdir($folder_name, 0777, true);
@@ -268,13 +111,15 @@ namespace Image{
          * @param string $prefix_of_filename
          * @return $this
          */
-        public function save_image($prefix_of_filename = 'effected_'){
+        public function save_image($prefix_of_filename = 'effected_', $folder_name = 'Manipulated_Images'){
+            //make a directory to store the images
+            $this->make_directory($folder_name);
             switch ($this->file_type){
                 case 'png':
-                    imagepng($this->image,'Insta_Effect/'.$prefix_of_filename.$this->file_name, 9);
+                    imagepng($this->image,"$folder_name/".$prefix_of_filename.$this->file_name, 9);
                     break;
                 case 'jpg':
-                    imagejpeg($this->image,'Insta_Effect/'.$prefix_of_filename.$this->file_name, 100);
+                    imagejpeg($this->image,"$folder_name/".$prefix_of_filename.$this->file_name, 100);
                     break;
             }
             return $this;
@@ -322,10 +167,7 @@ namespace Image{
          */
         public function rotate_image($deg = 45.0){
             $deg = floatval($deg);
-            $rotated_photo = imagerotate ($this->image , $deg , 0 );
-            imagejpeg($rotated_photo, 'Insta_Effect/rotate.jpg');
-            $this->clone_image_src_dest($rotated_photo, $this->image);
-//            $this->save_image('__rotate');
+            $this->image = imagerotate ($this->image , $deg , 0 );
             return $this;
         }
 
@@ -340,19 +182,10 @@ namespace Image{
          */
         public function crop($position_x = 200, $position_y = 200, $width = 500, $height = 400){
             $size = min(imagesx($this->image), imagesy($this->image));
-            $flag = false;
+
             if ($size > $width && $size > $height){
-                $cropped_image = imagecrop($this->image, ['x' => $position_x, 'y' => $position_y, 'width' => $width, 'height' => $height]);
-                $flag = true;
+                $this->image = imagecrop($this->image, ['x' => $position_x, 'y' => $position_y, 'width' => $width, 'height' => $height]);
             }
-//            $this->display_image($cropped_image);
-            if ($flag) {
-                $this->clone_image_src_dest($cropped_image, $this->image);
-//                $this->save_image('cropped_');
-            }
-//            else{
-//                $this->save_image('not_cropped_');
-//            }
             return $this;
         }
 
@@ -715,6 +548,179 @@ namespace Image{
          */
         public function getAspectRatio($image){
             return imagesx($image) / imagesy($image);
+        }
+
+        /**
+         * creates the aqua effect on the image
+         * @return $this
+         */
+        public function insta_aqua() {
+//            $this->clone_image_resource();
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
+//            $this->save_image('insta_aqua_');
+            return $this;
+        }
+
+        /**
+         * creates the sepia effect on the image
+         * @return $this
+         */
+        public function insta_sepia() {
+//            $this->clone_image_resource();
+            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
+//            $this->save_image('insta_sepia_');
+            return $this;
+        }
+
+        /**
+         * creates the cool effect on the image
+         * @return $this
+         */
+        public function insta_cool() {
+            imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -50);
+            return $this;
+        }
+
+        /**
+         * creates the light effect on the image
+         * @return $this
+         */
+        public function insta_light() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0, 10);
+            return $this;
+        }
+
+        /**
+         * creates the fuzzy effect on the image
+         * @return $this
+         */
+        public function insta_fuzzy() {
+            $gaussian = array(
+                array(1.0, 1.0, 1.0),
+                array(1.0, 1.0, 1.0),
+                array(1.0, 1.0, 1.0)
+            );
+            imageconvolution($this->image, $gaussian, 9, 20);
+            return $this;
+        }
+
+        /**
+         * creates the boost effect on the image
+         * @return $this
+         */
+        public function insta_boost() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -35);
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            return $this;
+        }
+
+        /**
+         * creates the antique effect on the image
+         * @return $this
+         */
+        public function insta_antique() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 0);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -30);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 75, 50, 25);
+            return $this;
+        }
+
+        /**
+         * creates the vintage effect on the image
+         * @return $this
+         */
+        public function insta_vintage() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 40, 10, -15);
+            return $this;
+        }
+
+        /**
+         * creates the everglow effect on the image
+         * @return $this
+         */
+        public function insta_everglow() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -30);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 30, 30, 0);
+            return $this;
+        }
+
+        /**
+         * creates the freshblue effect on the image
+         * @return $this
+         */
+        public function insta_freshblue() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 20, 0, 80, 60);
+            return $this;
+        }
+
+        /**
+         * creates the tender effect on the image
+         * @return $this
+         */
+        public function insta_tender() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, 5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 80, 20, 40, 50);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 40, 40, 100);
+            imagefilter($this->image, IMG_FILTER_SELECTIVE_BLUR);
+            return $this;
+        }
+
+        /**
+         * creates the dream effect on the image
+         * @return $this
+         */
+        public function insta_dream() {
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 150, 0, 0, 50);
+            imagefilter($this->image, IMG_FILTER_NEGATE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 50, 0, 50);
+            imagefilter($this->image, IMG_FILTER_NEGATE);
+            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
+            return $this;
+        }
+
+        /**
+         * creates the frozen effect on the image
+         * @return $this
+         */
+        public function insta_frozen() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -15);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
+            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
+            return $this;
+        }
+
+        /**
+         * creates the sharpen effect on the image
+         * @return $this
+         */
+        public function insta_sharpen() {
+
+            $gaussian = array(
+                array(1.0, 1.0, 1.0),
+                array(1.0, -7.0, 1.0),
+                array(1.0, 1.0, 1.0)
+            );
+            imageconvolution($this->image, $gaussian, 1, 4);
+//            $this->save_image('insta_sharpen_');
+            return $this;
+        }
+
+        /**
+         * creates a radium effect on the image
+         * @return $this
+         */
+        public function radium(){
+            // change gamma value of the pic
+            imagegammacorrect($this->image, 1.0, .1);
+            return $this;
         }
 
         /**
