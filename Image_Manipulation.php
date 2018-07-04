@@ -67,6 +67,130 @@ namespace Image{
         }
 
         /**
+         * creates the cool effect on the image
+         * @return $this
+         */
+        public function insta_cool() {
+            imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -50);
+            return $this;
+        }
+
+        /**
+         * creates the light effect on the image
+         * @return $this
+         */
+        public function insta_light() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0, 10);
+            return $this;
+        }
+
+        /**
+         * creates the fuzzy effect on the image
+         * @return $this
+         */
+        public function insta_fuzzy() {
+            $gaussian = array(
+                array(1.0, 1.0, 1.0),
+                array(1.0, 1.0, 1.0),
+                array(1.0, 1.0, 1.0)
+            );
+            imageconvolution($this->image, $gaussian, 9, 20);
+            return $this;
+        }
+
+        /**
+         * creates the boost effect on the image
+         * @return $this
+         */
+        public function insta_boost() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -35);
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            return $this;
+        }
+
+        /**
+         * creates the antique effect on the image
+         * @return $this
+         */
+        public function insta_antique() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 0);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -30);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 75, 50, 25);
+            return $this;
+        }
+
+        /**
+         * creates the vintage effect on the image
+         * @return $this
+         */
+        public function insta_vintage() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, 10);
+            imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 40, 10, -15);
+            return $this;
+        }
+
+        /**
+         * creates the everglow effect on the image
+         * @return $this
+         */
+        public function insta_everglow() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -30);
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 30, 30, 0);
+            return $this;
+        }
+
+        /**
+         * creates the freshblue effect on the image
+         * @return $this
+         */
+        public function insta_freshblue() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, -5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 20, 0, 80, 60);
+            return $this;
+        }
+
+        /**
+         * creates the tender effect on the image
+         * @return $this
+         */
+        public function insta_tender() {
+            imagefilter($this->image, IMG_FILTER_CONTRAST, 5);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 80, 20, 40, 50);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 40, 40, 100);
+            imagefilter($this->image, IMG_FILTER_SELECTIVE_BLUR);
+            return $this;
+        }
+
+        /**
+         * creates the dream effect on the image
+         * @return $this
+         */
+        public function insta_dream() {
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 150, 0, 0, 50);
+            imagefilter($this->image, IMG_FILTER_NEGATE);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 50, 0, 50);
+            imagefilter($this->image, IMG_FILTER_NEGATE);
+            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
+            return $this;
+        }
+
+        /**
+         * creates the frozen effect on the image
+         * @return $this
+         */
+        public function insta_frozen() {
+            imagefilter($this->image, IMG_FILTER_BRIGHTNESS, -15);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
+            imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 0, 100, 50);
+            imagefilter($this->image, IMG_FILTER_GAUSSIAN_BLUR);
+            return $this;
+        }
+
+        /**
          * creates the sharpen effect on the image
          * @return $this
          */
