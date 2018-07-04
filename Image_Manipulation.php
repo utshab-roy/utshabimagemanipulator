@@ -2,7 +2,6 @@
 namespace Image{
     class Image_Manipulation{
         public $file;
-        private $data;
 //  boolean variables
         public $rotation, $resize, $texted, $stamped, $watermarked, $thumbnailed, $croped, $flip_vertically, $flip_horizontally, $grayed, $watermarked2, $flip_both, $bordered, $effected, $bestFit = false;
 
@@ -19,7 +18,6 @@ namespace Image{
         public $thumb_ratio;
 
 
-//        **************************REWRITE BEGIN*********************************************************************
         protected $image;
         protected $original_image;
         protected $clone_image;
@@ -45,12 +43,11 @@ namespace Image{
             }
         }
 
-
         /**
          * creates the aqua effect on the image
          * @return $this
          */
-        public function aqua() {
+        public function insta_aqua() {
 //            $this->clone_image_resource();
             imagefilter($this->image, IMG_FILTER_COLORIZE, 0, 70, 0, 30);
             $this->save_image('insta_aqua_');
@@ -61,7 +58,7 @@ namespace Image{
          * creates the sepia effect on the image
          * @return $this
          */
-        public function sepia() {
+        public function insta_sepia() {
 //            $this->clone_image_resource();
             imagefilter($this->image, IMG_FILTER_GRAYSCALE);
             imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
@@ -73,7 +70,7 @@ namespace Image{
          * creates the sharpen effect on the image
          * @return $this
          */
-        public function sharpen() {
+        public function insta_sharpen() {
 //            $this->clone_image_resource();
             $gaussian = array(
                 array(1.0, 1.0, 1.0),
@@ -148,7 +145,6 @@ namespace Image{
             }
         }
 
-
         /**
          * saves the file with prefix on the original file
          * @param string $prefix_of_filename
@@ -197,14 +193,16 @@ namespace Image{
         }
 
         /**
-         * this method suppose to rotate the image but don't know why not working
+         * this method rotate the image according to the given degree
          * @param float $deg
          * @return $this
          */
         public function rotate_image($deg = 45.0){
-//            $deg = floatval($deg);
-            imagerotate($this->image, $deg, 0);
-            $this->save_image('rotate_');
+            $deg = floatval($deg);
+            $rotated_photo = imagerotate ($this->image , $deg , 0 );
+            imagejpeg($rotated_photo, 'Insta_Effect/rotate.jpg');
+            $this->clone_image_src_dest($rotated_photo, $this->image);
+            $this->save_image('__rotate');
             return $this;
         }
 
@@ -362,6 +360,14 @@ namespace Image{
             return $this;
         }
 
+        /**
+         * this method add a border on the image and the border thickness depends on the $thickness var
+         * @param int $thickness
+         * @param int $red
+         * @param int $green
+         * @param int $blue
+         * @return $this
+         */
         public function border_on_image($thickness = 10, $red = 255, $green = 0, $blue = 0){
             //width and height of the image
             $width = imagesx($this->image);
@@ -501,6 +507,7 @@ namespace Image{
          * this method watermark the original image with the given image, first it resize the given
          * image then it create the watermark of the image
          * @param $image_path
+         * @param int $opacity
          * @return $this
          */
         public function watermark_with_image($image_path, $opacity = 40){
@@ -588,106 +595,8 @@ namespace Image{
             return imagesx($image) / imagesy($image);
         }
 
-//        *******************************REWRITE END****************************************************************
-
-
-        /**
-         * Rotate image by degree the parameter takes a int value as rotation degree
-         * @param int $deg
-         */
-        public function rotate_image__($deg = 45){
-
-            if(isset($this->file)){
-                $deg = floatval($deg);
-                $this->data = imagecreatefromjpeg('images/'.$this->file);
-                //getting the file extension
-                $file_ext = $this->get_file_extension($this->file);
-                //creating the image according to file type
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-                imagesetinterpolation($this->data, IMG_BELL);
-                $image_rotated = imagerotate($this->data, $deg, 0);
-                //saving the file with prefix
-                $this->save_file($image_rotated,'rotated_',$this->file,$file_ext);
-                $this->rotated_file = 'rotated_'.$this->file;
-                imagedestroy($this->data);
-
-                $this->rotation = true;
-            }
-
-        }
-        
-        /**
-         * this method will change the image to best fit, according to it's orientation.
-         * it has some bug. Need tobe fixed. I believe the bug is on the  imagecopyresampled method
-         * @param int $maxWidth
-         * @param int $maxHeight
-         */
-        public function best_fit($maxWidth = 300, $maxHeight = 300){
-            if(isset($this->file)) {
-                //getting the file extension of the image
-                $file_ext = $this->get_file_extension($this->file);
-                //creating the image instances
-                $this->data = $this->image_create_according_to_file_extension($this->file,$file_ext);
-
-                //getting the width and the height of the image
-                $width = imagesx($this->data);
-                $height = imagesy($this->data);
-
-                // If the image already fits, there's nothing to do
-                if($width <= $maxWidth && $height <= $maxHeight) {
-                    $this->save_file($this->data,'bestFit_', $this->file, $file_ext);
-                    $this->bestFit_file = 'bestFit_'.$this->file;
-                    imagedestroy($this->data);
-                    $this->bestFit = true;
-                }
-                else{
-                    //get the orientation of the image
-                    //landscape orientation
-                    if($width > $height){
-                        $width = $maxWidth;
-                        $height = $maxWidth / $this->getAspectRatio($this->data);
-                    }
-                    //portrait orientation
-                    elseif($width < $height){
-                        $height = $maxHeight;
-                        $width = $maxHeight * $this->getAspectRatio($this->data);
-                    }
-                    //square orientation
-                    else{
-                        $height = $maxHeight;
-                        $width = $maxWidth;
-                    }
-
-                    // Reduce to max width
-                    if($width > $maxWidth) {
-                        $width = $maxWidth;
-                        $height = $width / $this->getAspectRatio($this->data);
-                    }
-
-                    // Reduce to max height
-                    if($height > $maxHeight) {
-                        $height = $maxHeight;
-                        $width = $height * $this->getAspectRatio($this->data);
-                    }
-
-                    //resizing the image file...
-                    $destination = imagecreatetruecolor($width, $height);
-                    imagecopyresampled($destination, $this->data, 0, 0, 0, 0, $width, $height, $width, $height);
-
-                    //saving the image file
-                    $this->save_file($destination,'bestFit_', $this->file, $file_ext);
-                    $this->bestFit_file = 'bestFit_'.$this->file;
-                    imagedestroy($this->data);
-                    imagedestroy($destination);
-                    $this->bestFit = true;
-                }
-            }
-        }
-
-
         /**
          * this function will upload image to the images folder
-         *
          */
         public function upload_image(){
             if(isset($_FILES['image'])){

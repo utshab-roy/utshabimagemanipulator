@@ -5,10 +5,6 @@ error_reporting(E_ALL);
 
 include 'autoload.php';
 
-//this will create the manipulated_image folder it not exists.
-if (!file_exists('manipulated_image')) {
-    mkdir('manipulated_image', 0777, true);
-}
 
 $img = new Image\Image_Manipulation('images/books1.jpg'); //does not require () at the end. why ?
 
@@ -66,9 +62,10 @@ if(isset($_POST['thumbnail_ratio']) && intval($_POST['thumbnail_ratio']) > 0){
 //$img->best_fit(500, 500);
 
 $img
-//    ->aqua()
-//    ->sharpen()
-//    ->rotate_image(10)
+//    ->insta_aqua()
+//    ->insta_sharpen()
+//    ->insta_sepia()
+//    ->rotate_image(30)
 //    ->resize_image(.9, .9)
 //    ->text_on_image()
 //    ->flip_image('both')
@@ -210,9 +207,6 @@ if($img->bestFit == true){
     echo '<br/><h3>Best Fit</h3></br>';
     echo "<img src='manipulated_image/$img->bestFit_file' >";
 }
-
-
-
 
 ?>
 
