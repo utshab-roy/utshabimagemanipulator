@@ -25,7 +25,7 @@ $img
 //    ->rotate_image(90)                                    // rotate the image
 //    ->resize_image(.9, .9)                                // resize the image
 //    ->text_on_image()                                     // text on image
-    ->flip_image('both');                                  // flip the image, three options
+    ->flip_image('both')                                  // flip the image, three options
 //    ->border_on_image(15, 25, 141, 214)                    // creates a border on the image
 //    ->GD_effect('colorize')
 //    ->watermark_image(70, 30, 30)
@@ -35,4 +35,4 @@ $img
 //    ->crop(200,200,500,500)
 //    ->resize_image_pixels(600, 200)
 //    ->save_image()
-//    ->display();
+    ->display();
