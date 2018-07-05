@@ -1,13 +1,14 @@
 <?php
 /**
- * @category   PhotoEditor
+ * @category   Image Editor
  * @package    Image
- * @author     Utshab Roy<utshab.roy@gmail.com>
+ * @class      Image_Manipulation
+ * @author     Utshab Roy <utshab.roy@gmail.com>
  * @copyright  2018 Utshab Roy
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License (GPL)
  * @version    Release: @package_version@ 1.0.0
- * @link       https://github.com/utshab-roy/photoEditor_php
- * @see        NetOther, Net_Sample::Net_Sample()
+ * @link
+ * @see        https://github.com/utshab-roy/photoEditor_php
  * @since      Class available since Release 1.0.0
  */
 
@@ -21,6 +22,7 @@ namespace Image{
         protected $file_type;
         protected $file_name;
         protected $file_path;
+        public $file;
 
         public function __construct($file_path)
         {
@@ -36,7 +38,6 @@ namespace Image{
                     break;
             }
         }
-
 
         /**
          * this method takes the file name or file path and returns the file extension
@@ -80,11 +81,11 @@ namespace Image{
          * @param $dest
          */
         public function clone_image_src_dest(&$src, &$dest){
-            $width  = imagesx($src);
-            $height = imagesy($src);
-
-            $dest_width  = imagesx($dest);
-            $dest_height = imagesy($dest);
+//            $width  = imagesx($src);
+//            $height = imagesy($src);
+//
+//            $dest_width  = imagesx($dest);
+//            $dest_height = imagesy($dest);
 
 //            $dest = imagecreate($width,$height);
             $dest = imagerotate($src, 360, 1);
@@ -109,6 +110,7 @@ namespace Image{
         /**
          * saves the file with prefix on the original file
          * @param string $prefix_of_filename
+         * @param string $folder_name
          * @return $this
          */
         public function save_image($prefix_of_filename = 'effected_', $folder_name = 'Manipulated_Images'){
@@ -732,7 +734,7 @@ namespace Image{
                 $file_name = $_FILES['image']['name'];
                 $file_size =$_FILES['image']['size'];
                 $file_tmp =$_FILES['image']['tmp_name'];
-                $file_type=$_FILES['image']['type'];
+//                $file_type=$_FILES['image']['type'];
 
                 $tmp = explode('.', $file_name);
                 $file_ext = end($tmp);
