@@ -5,13 +5,14 @@ This is a object oriented php project which basically use GD library to manipula
 
   - Using this library you can manipulate image
   - Add effect on image very easily
-  - Lightwight library, with fast functionality
+  - Light-wight library, with fast functionality
 
 # Features
 
   - Add Instagram effect on the image very easily 
   - Using Method Chain you can get multiple effect and functionality at the same time 
   - You can crop, resize, rotate, add text on image 
+  - Support for jpg and png type of file 
 
 
 You can also:
@@ -42,7 +43,7 @@ No install dependencies required. Using this library is very easy. A very basic 
 include 'photoEditor_php/Image_Manipulation.php';
 
 //creating the object
-$image = new Image\Image_Manipulation('books1.jpg');
+$image = new Image\Image_Manipulation('path/to/image.jpg');
 
 //calling the function
 $image
@@ -97,6 +98,7 @@ These are some available method you can use to manipulate the image as you want.
 ### Development
 
 Want to contribute? Great!
+
 If you find any bug or want ot improve it just ***fork*** on the git project and it will create a  ***pull request*** I will accept it.
 ***[Git Repo of this project][gitRepo]***
 
