@@ -12,7 +12,7 @@
  * @since      Class available since Release 1.0.0
  */
 
-namespace Image{
+namespace Utshabimagemanipulator{
     class Image_Manipulation{
 
         protected $image;
@@ -72,11 +72,13 @@ namespace Image{
             $this->image = imagecreatetruecolor($width, $height);
 
             imagecopy($this->clone_image, $this->image, 0, 0, 0, 0, $width, $height);
+            $this->display_image($this->clone_image);
+            return $this;
         }
 
         /**
          * this method clone the image resource GD type according to source to destination
-         * still not working perfectly
+         * still not working perfectly, I use rotate method for the copy image resource
          * @param $src
          * @param $dest
          */

@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 include 'autoload.php';
 
-$img = new Image\Image_Manipulation('images/books2.jpg');
+$img = new Utshabimagemanipulator\Image_Manipulation('images/books2.jpg');
 
 $img
 //    ->insta_aqua()
