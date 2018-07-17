@@ -40,10 +40,10 @@ No install dependencies required. Using this library is very easy. A very basic 
 
 ```php
 //include the class file
-include 'photoEditor_php/Image_Manipulation.php';
+include 'imagemanipulator/Image_Manipulation.php';
 
 //creating the object
-$image = new Image\Image_Manipulation('path/to/image.jpg');
+$image = new Utshabimagemanipulator\Image_Manipulation('path/to/image.jpg');
 
 //calling the function
 $image
@@ -51,7 +51,7 @@ $image
     
     ->flip_image('both')        // flip the image in both x-axis and y-axis
     
-    ->save_image('edited_')     // saving the image   
+    ->save_image('prefix_')     // saving the image   
     
     ->display();                // this will display the image on the screen
 ```
